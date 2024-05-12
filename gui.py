@@ -127,23 +127,28 @@ class GUI:
                 viewer_label = tk.Label(self.current_window, text="Меню для зрителя")
                 show_actors_btn = tk.Button(
                     self.current_window,
-                    text="Показать актеров",
+                    text="Страница актеров",
                     command=lambda: self.__set_next_window("show_actors"),
                 )
                 show_events_btn = tk.Button(
                     self.current_window,
-                    text="Показать события",
+                    text="Страница событий",
                     command=lambda: self.__set_next_window("show_events"),
                 )
                 show_impresarios_btn = tk.Button(
                     self.current_window,
-                    text="Показать импресарио",
+                    text="Страница импресарио",
                     command=lambda: self.__set_next_window("show_impresarios"),
                 )
                 show_buildings_btn = tk.Button(
                     self.current_window,
-                    text="Показать здания",
+                    text="Страница зданий",
                     command=lambda: self.__set_next_window("show_buildings"),
+                )
+                show_contests_btn = tk.Button(
+                    self.current_window,
+                    text="Страница конкурсов",
+                    command=lambda: self.__set_next_window("show_contests"),
                 )
                 exit_btn = tk.Button(
                     self.current_window,
@@ -156,6 +161,7 @@ class GUI:
                 show_events_btn.pack()
                 show_impresarios_btn.pack()
                 show_buildings_btn.pack()
+                show_contests_btn.pack()
                 exit_btn.pack()
             case "event_manager":
                 impresario_label = tk.Label(
@@ -163,28 +169,33 @@ class GUI:
                 )
                 show_actors_btn = tk.Button(
                     self.current_window,
-                    text="Показать актеров",
+                    text="Страница актеров",
                     command=lambda: self.__set_next_window("show_actors"),
                 )
                 show_events_btn = tk.Button(
                     self.current_window,
-                    text="Показать события",
+                    text="Страница событий",
                     command=lambda: self.__set_next_window("show_events"),
                 )
                 show_impresarios_btn = tk.Button(
                     self.current_window,
-                    text="Показать импресарио",
+                    text="Страница импресарио",
                     command=lambda: self.__set_next_window("show_impresarios"),
                 )
                 show_buildings_btn = tk.Button(
                     self.current_window,
-                    text="Показать здания",
+                    text="Страница зданий",
                     command=lambda: self.__set_next_window("show_buildings"),
                 )
                 create_event_btn = tk.Button(
                     self.current_window,
                     text="Создать событие",
                     command=lambda: self.__set_next_window("create_event"),
+                )
+                show_contests_btn = tk.Button(
+                    self.current_window,
+                    text="Страница конкурсов",
+                    command=lambda: self.__set_next_window("show_contests"),
                 )
                 exit_btn = tk.Button(
                     self.current_window,
@@ -198,6 +209,7 @@ class GUI:
                 show_impresarios_btn.pack()
                 show_buildings_btn.pack()
                 create_event_btn.pack()
+                show_contests_btn.pack()
                 exit_btn.pack()
 
         self.current_window.mainloop()
@@ -373,6 +385,55 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __show_contests(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Конкурсы")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+        events = self.db_manager.select_contests()
+
+        # Создание таблицы для отображения данных
+        table = ttk.Treeview(
+            self.current_window,
+            columns=(
+                "name",
+                "first_place",
+                "second_place",
+                "third_place",
+            ),
+        )
+        table["show"] = "headings"
+        table.heading("name", text="Название конкурса")
+        table.heading("first_place", text="Первое место")
+        table.heading("second_place", text="Второе место")
+        table.heading("third_place", text="Третье место")
+
+        # Вставка данных в таблицу
+        for row in events:
+            first_place = f"{row[1]} {row[2]}"  # Объединяем имя и фамилию первого места
+            second_place = (
+                f"{row[3]} {row[4]}"  # Объединяем имя и фамилию второго места
+            )
+            third_place = (
+                f"{row[5]} {row[6]}"  # Объединяем имя и фамилию третьего места
+            )
+            table.insert(
+                "", "end", values=[row[0], first_place, second_place, third_place]
+            )
+
+        # Размещение таблицы на окне
+        table.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __to_main_menu(self):
         if self.current_window:
             self.current_window.destroy()
@@ -404,6 +465,8 @@ class GUI:
         )
         genre_combobox.pack()
 
+        impresario_label = tk.Label(self.current_window, text="Выберите импресарио:")
+        impresario_label.pack()
         impresario_combobox = ttk.Combobox(
             self.current_window, values=list(impresarios.values())
         )
@@ -450,4 +513,6 @@ class GUI:
                 next_window = self.__show_buildings()
             case "create_event":
                 next_window = self.__create_event()
+            case "show_contests":
+                next_window = self.__show_contests()
         return next_window

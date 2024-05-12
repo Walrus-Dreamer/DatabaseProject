@@ -231,6 +231,27 @@ class TablesGenerator:
                     f"\t-Trigger 'set_impresario_genre_link_creation_date' was not created due to: {error}."
                 )
 
+    @staticmethod
+    def __add_contest_triggers(cursor):
+        try:
+            cursor.execute(
+                """
+                        CREATE TRIGGER set_contest_creation_date
+                                BEFORE INSERT ON contest_table
+                                FOR EACH ROW
+                                BEGIN
+                                    SET NEW.creation_date = NOW();
+                                END;
+                        """
+            )
+            if log:
+                print("\t-Trigger 'set_contest_creation_date' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(
+                    f"\t-Trigger 'set_contest_creation_date' was not created due to: {error}."
+                )
+
     # TODO: вынести генерацию каждой процедуры в отдельную функцию
     @staticmethod
     def __add_functions(cursor):
@@ -427,6 +448,27 @@ class TablesGenerator:
             print("\t-Table 'impresario_genre_link' created successfully.")
 
     @staticmethod
+    def __create_contest_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS contest (
+                                id INT AUTO_INCREMENT PRIMARY KEY,
+                                name VARCHAR(255),
+                                creation_date TIMESTAMP,
+
+                                first_place_id INT,
+                                second_place_id INT,
+                                third_place_id INT,
+
+                                FOREIGN KEY (first_place_id) REFERENCES actor(id),
+                                FOREIGN KEY (second_place_id) REFERENCES actor(id),
+                                FOREIGN KEY (third_place_id) REFERENCES actor(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'impresario_genre_link' created successfully.")
+
+    @staticmethod
     def create_tables(connector):
         cursor = connector.cursor()
         if log:
@@ -439,6 +481,7 @@ class TablesGenerator:
             TablesGenerator.__create_actor_table(cursor)
             TablesGenerator.__create_actor_genre_link_table(cursor)
             TablesGenerator.__create_impresario_genre_link_table(cursor)
+            TablesGenerator.__create_contest_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))
@@ -456,6 +499,7 @@ class TablesGenerator:
             TablesGenerator.__add_actor_triggers(cursor)
             TablesGenerator.__add_actor_genre_link_triggers(cursor)
             TablesGenerator.__add_impresario_genre_link_triggers(cursor)
+            TablesGenerator.__add_contest_triggers(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create trigger: {}".format(error))
@@ -594,7 +638,7 @@ class DumpGenerator:
             print("\t-Actors dump created successfully.")
 
     @staticmethod
-    def __insert_actor_genre_link(cursor):
+    def __insert_actor_genre_links(cursor):
         cursor.execute(
             """
                         INSERT INTO actor_genre_link (actor_id, genre_name) VALUES
@@ -633,7 +677,7 @@ class DumpGenerator:
             print("\t-Actor_genre_link dump created successfully.")
 
     @staticmethod
-    def __insert_impresario_genre_link(cursor):
+    def __insert_impresario_genre_links(cursor):
         cursor.execute(
             """
                         INSERT INTO impresario_genre_link (impresario_id, genre_name) VALUES
@@ -672,6 +716,19 @@ class DumpGenerator:
             print("\t-Impresario_genre_link dump created successfully.")
 
     @staticmethod
+    def __insert_contests(cursor):
+        cursor.execute(
+            """
+                        INSERT INTO contest (name, first_place_id, second_place_id, third_place_id) VALUES
+                            ('Мисс вселенная', 3, 5, 8),
+                            ('Лучшая роль первого плана', 1, 2, 3),
+                            ('Лучшая роль второго плана', 6, 7, 8)
+                        """
+        )
+        if log:
+            print("\t-Actor_genre_link dump created successfully.")
+
+    @staticmethod
     def create_dump(connector):
         cursor = connector.cursor()
         if log:
@@ -682,8 +739,11 @@ class DumpGenerator:
             DumpGenerator.__insert_genres(cursor)
             DumpGenerator.__insert_events(cursor)
             DumpGenerator.__insert_actors(cursor)
-            DumpGenerator.__insert_actor_genre_link(cursor)
-            DumpGenerator.__insert_impresario_genre_link(cursor)
+            DumpGenerator.__insert_actor_genre_links(cursor)
+            DumpGenerator.__insert_impresario_genre_links(cursor)
+            DumpGenerator.__insert_contests(cursor)
+            if log:
+                print("\t-Dump created successfully.")
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create dump: {}".format(error))
@@ -753,6 +813,22 @@ class DBManager:
         self.cursor.execute("SELECT * FROM genre")
         return self.cursor.fetchall()
 
+    def select_contests(self):
+        self.cursor.execute(
+            """
+            SELECT c.name AS contest_name, 
+                a1.name AS first_place_name, a1.surname AS first_place_surname,
+                a2.name AS second_place_name, a2.surname AS second_place_surname,
+                a3.name AS third_place_name, a3.surname AS third_place_surname
+            FROM contest c
+            JOIN actor a1 ON c.first_place_id = a1.id
+            JOIN actor a2 ON c.second_place_id = a2.id
+            JOIN actor a3 ON c.third_place_id = a3.id;
+
+            """
+        )
+        return self.cursor.fetchall()
+
     def insert_event(self, name, genre_name, impresario_id):
         self.cursor.execute(
             f"CALL add_event('{name}', '{genre_name}', {impresario_id})"
@@ -765,263 +841,3 @@ class DBManager:
             print(result)
             result += repr(row) + "\n"
         return result
-
-
-# # НАЧАЛО РАБОТЫ #
-# db_initer = DbInitializer()
-
-# TablesGenerator.create_tables(db_initer.connector)
-# TablesGenerator.create_triggers(db_initer.connector)
-# TablesGenerator.create_procedures(db_initer.connector)
-# TablesGenerator.create_functions(db_initer.connector)
-# DumpGenerator.create_dump(db_initer.connector)
-
-# db_manager = DBManager(db_initer.connector)
-
-
-# начало бубылды:
-"""
-CREATE DATABASE theatre
-
-DROP DATABASE theatre
-
-CREATE TRIGGER set_creation_date
-    BEFORE INSERT ON building
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE TRIGGER set_impresario_creation_date
-    BEFORE INSERT ON impresario
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE TRIGGER set_genre_creation_date
-    BEFORE INSERT ON genre
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE TRIGGER set_event_creation_date
-    BEFORE INSERT ON event
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE TRIGGER set_actor_creation_date
-    BEFORE INSERT ON actor
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE TRIGGER check_name_surname_no_digits
-    BEFORE INSERT ON actor
-    FOR EACH ROW
-    BEGIN
-        IF NEW.name REGEXP '[0-9]' THEN
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Name cannot contain digits';
-        END IF;
-        IF NEW.surname REGEXP '[0-9]' THEN
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Surname cannot contain digits';
-        END IF;
-    END
-
-CREATE TRIGGER set_actor_genre_link_creation_date
-    BEFORE INSERT ON actor_genre_link
-    FOR EACH ROW
-    BEGIN
-        SET NEW.creation_date = NOW();
-    END;
-
-CREATE FUNCTION get_impresario_count(building_id INT) RETURNS INT DETERMINISTIC
-    BEGIN
-        DECLARE count INT;
-        SELECT COUNT(*) INTO count FROM impresario WHERE impresario.building_id = building_id;
-        RETURN count;
-    END
-
-CREATE FUNCTION get_genre_by_name(genre_name VARCHAR(255)) RETURNS VARCHAR(255) DETERMINISTIC
-    BEGIN
-        DECLARE genre VARCHAR(255);
-        SELECT name INTO genre FROM genre WHERE name = genre_name;
-        RETURN genre;
-    END
-
-CREATE PROCEDURE get_impresario_by_id(IN id INT)
-    BEGIN
-        SELECT * FROM impresario WHERE impresario.id = id;
-    END
-
-CREATE PROCEDURE add_building(IN building_name VARCHAR(255))
-    BEGIN
-        INSERT INTO building (name) VALUES (building_name);
-    END
-
-CREATE PROCEDURE add_impresario(IN building_id INT, IN name VARCHAR(255), IN surname VARCHAR(255), IN age INT, IN creation_date TIMESTAMP)
-    BEGIN
-        INSERT INTO impresario (building_id, name, surname, age, creation_date) VALUES (building_id, name, surname, age, creation_date);
-    END
-
-CREATE TABLE IF NOT EXISTS building (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    creation_date TIMESTAMP
-)
-
-CREATE TABLE IF NOT EXISTS impresario (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    building_id INT,
-    name VARCHAR(255),
-    surname VARCHAR(255),
-    age INT,
-    creation_date TIMESTAMP,
-
-    FOREIGN KEY (building_id) REFERENCES building(id)
-)
-
-CREATE TABLE IF NOT EXISTS genre (
-    name VARCHAR(255) PRIMARY KEY,
-    creation_date TIMESTAMP
-)
-
-CREATE TABLE IF NOT EXISTS event (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    genre_name VARCHAR(255),
-    impresario_id INT,
-    creation_date TIMESTAMP,
-
-    FOREIGN KEY (genre_name) REFERENCES genre(name),
-    FOREIGN KEY (impresario_id) REFERENCES impresario(id)
-)
-
-CREATE TABLE IF NOT EXISTS actor (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_id INT,
-    building_id INT,
-    name VARCHAR(255),
-    surname VARCHAR(255),
-    age INT,
-    creation_date TIMESTAMP,
-    
-    FOREIGN KEY (event_id) REFERENCES event(id),
-    FOREIGN KEY (building_id) REFERENCES building(id)
-)
-
-CREATE TABLE IF NOT EXISTS actor_genre_link (
-    actor_id INT,
-    genre_name VARCHAR(255),
-    creation_date TIMESTAMP,
-
-    FOREIGN KEY (actor_id) REFERENCES actor(id) ON DELETE CASCADE,
-    FOREIGN KEY (genre_name) REFERENCES genre(name) ON DELETE CASCADE
-)
-
-INSERT INTO building (name) VALUES 
-    ('Небесная башня'),
-    ('Сапфировый дом'),
-    ('Эмеральдовые вершины'),
-    ('Золотой горизонт'),
-    ('Дом культуры');
-
-INSERT INTO impresario (building_id, name, surname, age) VALUES 
-    (1, 'Алиса', 'Сизых', 28),
-    (2, 'Татьяна', 'Белая', 32),
-    (3, 'Сара', 'Тайлор', 27),
-    (4, 'Джон', 'Смит', 35),
-    (5, 'Мария', 'Джонсон', 42),
-    (1, 'Евгений', 'Уильямс', 29),
-    (2, 'Эмили', 'Блэк', 31),
-    (3, 'Уильям', 'Дэвис', 26),
-    (4, 'Оливия', 'Миллер', 39),
-    (5, 'Даниил', 'Польский', 33),
-    (1, 'София', 'Мур', 45),
-    (2, 'Михаил', 'Тайлор', 37),
-    (3, 'Эмма', 'Андерсон', 30),
-    (4, 'Александр', 'Томас', 34),
-    (5, 'Грейс', 'Джексон', 41);
-
-INSERT INTO genre (name) VALUES 
-    ('Драма'),
-    ('Комедия'),
-    ('Симфония'),
-    ('Опера'),
-    ('Романтика'),
-    ('Балет'),
-    ('Документальный'),
-    ('Мистика'),
-    ('Фантастика'),
-    ('Научно-популярный'),
-    ('Мюзикл'),
-    ('Анимация')
-
-INSERT INTO event (name, genre_name, impresario_id) VALUES
-    ('Последний вздох', 'Драма', 1),
-    ('Вставай', 'Комедия', 2),
-    ('Ее след', 'Романтика', 3),
-    ('Отличник с личной жизнью', 'Фантастика', 4),
-    ('Астрал', 'Мистика', 5),
-    ('Пара по психологии', 'Комедия', 6),
-    ('Щелкунчик', 'Балет', 7),
-    ('Лебединое озеро', 'Балет', 8),
-    ('Рад вас видеть', 'Комедия', 9),
-    ('Кошки', 'Мюзикл', 10),
-    ('Спящая красавица', 'Балет', 11),
-    ('Film Screening', 'Анимация', 12),
-    ('Дон Кихот', 'Балет', 13),
-    ('Баядерка', 'Балет', 14),
-    ('Жизель', 'Балет', 15);
-
-INSERT INTO actor (event_id, building_id, name, surname, age) VALUES 
-    (1, 1, 'Джон', 'До', 30),
-    (2, 2, 'Джейн', 'Смит', 25),
-    (4, 3, 'Сара', 'Уильямс', 28),
-    (5, 4, 'Алекс', 'Сизых', 32),
-    (6, 5, 'Эмили', 'Дэвис', 27),
-    (3, 1, 'Майк', 'Джонсон', 35),
-    (7, 2, 'Крис', 'Мартинез', 29),
-    (8, 3, 'Аманда', 'Гарция', 31),
-    (9, 4, 'Кевин', 'Родригез', 33),
-    (10, 5, 'Лаура', 'Лопез', 26),
-    (11, 1, 'Марк', 'Перез', 34),
-    (12, 2, 'Линда', 'Санчез', 30);
-
-INSERT INTO actor_genre_link (actor_id, genre_name) VALUES
-    (1, 'Драма'),
-    (2, 'Драма'),
-    (3, 'Драма'),
-    (2, 'Комедия'),
-    (3, 'Комедия'),
-    (4, 'Комедия'),
-    (3, 'Симфония'),
-    (4, 'Симфония'),
-    (5, 'Симфония'),
-    (4, 'Опера'),
-    (5, 'Опера'),
-    (6, 'Опера'),
-    (5, 'Романтика'),
-    (6, 'Романтика'),
-    (7, 'Романтика'),
-    (8, 'Романтика'),
-    (9, 'Балет'),
-    (7, 'Документальный'),
-    (8, 'Документальный'),
-    (8, 'Мистика'),
-    (9, 'Мистика'),
-    (10, 'Мистика'),
-    (11, 'Мистика'),
-    (7, 'Фантастика'),
-    (8, 'Фантастика'),
-    (9, 'Фантастика'),
-    (10, 'Научно-популярный'),
-    (11, 'Мюзикл'),
-    (12, 'Анимация')
-
-"""
-# конец бубылды.
