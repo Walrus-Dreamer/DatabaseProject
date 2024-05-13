@@ -47,13 +47,16 @@ class UsersGenerator:
         cursor.execute("CREATE USER 'admin'@'localhost' IDENTIFIED BY '1';")
         cursor.execute("GRANT 'admin_role'@'localhost' TO 'admin'@'localhost';")
         cursor.execute("GRANT SUPER ON *.* TO 'admin'@'localhost';")
+        cursor.execute("GRANT ALL ON theatre.* TO 'admin'@'localhost';")
+        cursor.execute("GRANT EXECUTE ON theatre.* TO 'admin'@'localhost';")
         if log:
             print("\t-Admin user created successfully.")
 
     @staticmethod
     def __add_viewer_user(cursor):
         cursor.execute("CREATE USER 'viewer'@'localhost' IDENTIFIED BY '1';")
-        cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
+        # cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
+        cursor.execute("GRANT SELECT ON theatre.* TO 'viewer'@'localhost';")
         cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';")
         if log:
             print("\t-Viewer user created successfully.")
@@ -61,9 +64,11 @@ class UsersGenerator:
     @staticmethod
     def __add_event_manager_user(cursor):
         cursor.execute("CREATE USER 'event_manager'@'localhost' IDENTIFIED BY '1';")
-        cursor.execute(
-            "GRANT 'event_manager_role'@'localhost' TO 'event_manager'@'localhost';"
-        )
+        # cursor.execute(
+        #     "GRANT 'event_manager_role'@'localhost' TO 'event_manager'@'localhost';"
+        # )
+        cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';")
+        cursor.execute("GRANT EXECUTE ON theatre.* TO 'event_manager'@'localhost';")
         if log:
             print("\t-Event manager user created successfully.")
 

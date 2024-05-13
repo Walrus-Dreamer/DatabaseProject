@@ -123,7 +123,7 @@ class DBManager:
         return self.cursor.fetchone()[0]
 
     def get_my_role(self):
-        self.cursor.execute(f"SELECT get_my_role();")
+        # self.cursor.execute(f"SELECT get_my_role();")
         # TODO: Починить определение ролей. Проблема в том, что роль по какой-то причине не дает пользователю никаких привилегий.
         # self.role = self.cursor.fetchone()[0]
         self.role = "event_manager"

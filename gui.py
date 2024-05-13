@@ -58,9 +58,6 @@ class GUI:
     """
 
     def connect_to_db_screen(self):
-        self.login_input = ""
-        self.password_input = ""
-
         self.current_window = tk.Tk()
         self.current_window.title("Подключение к базе данных")
         self.current_window.geometry("1280x720")
