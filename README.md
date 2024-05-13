@@ -12,7 +12,7 @@ brew services start mysql
 
 # **Запуск проекта**
 
-Запустить glebglebglebglebgleb_part3.py
+Запустить AAAAGLEBglebGLEBgleb.py
 
 # **ВАЖНО!**
 

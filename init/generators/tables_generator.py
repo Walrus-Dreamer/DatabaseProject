@@ -178,7 +178,7 @@ class TablesGenerator:
             cursor.execute(
                 """
                         CREATE TRIGGER set_contest_creation_date
-                                BEFORE INSERT ON contest_table
+                                BEFORE INSERT ON contest
                                 FOR EACH ROW
                                 BEGIN
                                     SET NEW.creation_date = NOW();
