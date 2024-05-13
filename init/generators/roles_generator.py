@@ -5,7 +5,8 @@ log = True
 
 class RolesGenerator:
     @staticmethod
-    def __refresh_roles(cursor):
+    def delete_roles(connector):
+        cursor = connector.cursor()
         try:
             cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'admin_role';")
             cursor.execute("DROP USER 'admin_role'@'localhost';")
@@ -92,7 +93,7 @@ class RolesGenerator:
         if log:
             print("\ncreate_default_roles log:")
         try:
-            RolesGenerator.__refresh_roles(cursor)
+            RolesGenerator.delete_roles(connector)
             RolesGenerator.__add_admin_role(cursor)
             RolesGenerator.__add_viewer_role(cursor)
             RolesGenerator.__add_event_manager_role(cursor)

@@ -23,7 +23,7 @@ class Kernel:
             TablesGenerator.create_procedures(db_initer.connector)
             TablesGenerator.create_functions(db_initer.connector)
             RolesGenerator.create_default_roles(db_initer.connector)
-            UserGenerator.create_default_users(db_initer.connector)
+            # UserGenerator.create_default_users(db_initer.connector)
             DumpGenerator.create_dump(db_initer.connector)
         except mysql.connector.Error as error:
             print(f"Failed to generate data: {error}")
@@ -35,8 +35,11 @@ class Kernel:
         next_window_name = "main_menu"
         while next_window_name != "exit":
             next_window_name = gui.handle_command(next_window_name, self.role)
-        # return
-        db_initer.drop_db()
+
+        user_decision = input("Вы хотите очистить базу? (y/n): ")
+        if user_decision == "y":
+            RolesGenerator.delete_roles(db_initer.connector)
+            db_initer.drop_db()
 
 
 kernel = Kernel()
