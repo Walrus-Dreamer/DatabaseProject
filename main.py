@@ -22,7 +22,7 @@ class Kernel:
             TablesGenerator.create_triggers(db_initer.connector)
             TablesGenerator.create_procedures(db_initer.connector)
             TablesGenerator.create_functions(db_initer.connector)
-            RolesGenerator.create_roles(db_initer.connector)
+            RolesGenerator.create_default_roles(db_initer.connector)
             DumpGenerator.create_dump(db_initer.connector)
         except mysql.connector.Error as error:
             print(f"Failed to generate data: {error}")

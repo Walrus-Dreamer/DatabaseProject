@@ -813,10 +813,10 @@ class RolesGenerator:
             print("-Impresario role created successfully.")
 
     @staticmethod
-    def create_roles(connector):
+    def create_default_roles(connector):
         cursor = connector.cursor()
         if log:
-            print("\ncreate_roles log:")
+            print("\ncreate_default_roles log:")
         try:
             RolesGenerator.__refresh_roles(cursor)
             RolesGenerator.__add_admin_role(cursor)
