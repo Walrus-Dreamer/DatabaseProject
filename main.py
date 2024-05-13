@@ -2,6 +2,7 @@ from init.db_init import DbInitializer
 from init.generators.dump_generator import DumpGenerator
 from init.generators.roles_generator import RolesGenerator
 from init.generators.tables_generator import TablesGenerator
+from init.generators.users_generator import UserGenerator
 from db_manager import DBManager
 
 from gui import GUI
@@ -22,6 +23,7 @@ class Kernel:
             TablesGenerator.create_procedures(db_initer.connector)
             TablesGenerator.create_functions(db_initer.connector)
             RolesGenerator.create_default_roles(db_initer.connector)
+            UserGenerator.create_default_users(db_initer.connector)
             DumpGenerator.create_dump(db_initer.connector)
         except mysql.connector.Error as error:
             print(f"Failed to generate data: {error}")

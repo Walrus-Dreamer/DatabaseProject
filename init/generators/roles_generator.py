@@ -7,26 +7,28 @@ class RolesGenerator:
     @staticmethod
     def __refresh_roles(cursor):
         try:
-            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'admin';")
-            cursor.execute("DROP USER 'admin'@'localhost';")
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'admin_role';")
+            cursor.execute("DROP USER 'admin_role'@'localhost';")
         except mysql.connector.Error as error:
             if log:
                 print("\t-Error: {}".format(error))
         try:
-            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'viewer';")
-            cursor.execute("DROP USER 'viewer'@'localhost';")
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'viewer_role';")
+            cursor.execute("DROP USER 'viewer_role'@'localhost';")
         except mysql.connector.Error as error:
             if log:
                 print("\t-Error: {}".format(error))
         try:
-            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'event_manager';")
-            cursor.execute("DROP USER 'event_manager'@'localhost';")
+            cursor.execute(
+                "DELETE FROM mysql.user WHERE User LIKE 'event_manager_role';"
+            )
+            cursor.execute("DROP USER 'event_manager_role'@'localhost';")
         except mysql.connector.Error as error:
             if log:
                 print("\t-Error: {}".format(error))
         try:
-            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'impresario';")
-            cursor.execute("DROP USER 'impresario'@'localhost';")
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'impresario_role';")
+            cursor.execute("DROP USER 'impresario_role'@'localhost';")
         except mysql.connector.Error as error:
             if log:
                 print("\t-Error: {}".format(error))
@@ -35,34 +37,44 @@ class RolesGenerator:
 
     @staticmethod
     def __add_admin_role(cursor):
-        cursor.execute("CREATE ROLE 'admin'@'localhost';")
-        cursor.execute("GRANT ALL ON theatre.* TO 'admin'@'localhost';")
+        cursor.execute("CREATE ROLE 'admin_role'@'localhost';")
+        cursor.execute("GRANT ALL ON theatre.* TO 'admin_role'@'localhost';")
         if log:
             print("-Admin role created successfully.")
 
     @staticmethod
     def __add_viewer_role(cursor):
-        cursor.execute("CREATE ROLE 'viewer'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'viewer'@'localhost';")
+        cursor.execute("CREATE ROLE 'viewer_role'@'localhost';")
+        cursor.execute("GRANT SELECT ON theatre.* TO 'viewer_role'@'localhost';")
         if log:
             print("-Viewer role created successfully.")
 
     @staticmethod
     def __add_event_manager_role(cursor):
-        cursor.execute("CREATE ROLE 'event_manager'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';")
-        cursor.execute("GRANT INSERT ON theatre.event TO 'event_manager'@'localhost';")
-        cursor.execute("GRANT UPDATE ON theatre.event TO 'event_manager'@'localhost';")
+        cursor.execute("CREATE ROLE 'event_manager_role'@'localhost';")
+        cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager_role'@'localhost';")
+        cursor.execute(
+            "GRANT INSERT ON theatre.event TO 'event_manager_role'@'localhost';"
+        )
+        cursor.execute(
+            "GRANT UPDATE ON theatre.event TO 'event_manager_role'@'localhost';"
+        )
         if log:
             print("-Event manager role created successfully.")
 
     @staticmethod
     def __add_impresario_role(cursor):
-        cursor.execute("CREATE ROLE 'impresario'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'impresario'@'localhost';")
-        cursor.execute("GRANT INSERT ON theatre.event TO 'impresario'@'localhost';")
-        cursor.execute("GRANT INSERT ON theatre.contest TO 'impresario'@'localhost';")
-        cursor.execute("GRANT UPDATE ON theatre.event TO 'impresario'@'localhost';")
+        cursor.execute("CREATE ROLE 'impresario_role'@'localhost';")
+        cursor.execute("GRANT SELECT ON theatre.* TO 'impresario_role'@'localhost';")
+        cursor.execute(
+            "GRANT INSERT ON theatre.event TO 'impresario_role'@'localhost';"
+        )
+        cursor.execute(
+            "GRANT INSERT ON theatre.contest TO 'impresario_role'@'localhost';"
+        )
+        cursor.execute(
+            "GRANT UPDATE ON theatre.event TO 'impresario_role'@'localhost';"
+        )
         if log:
             print("-Impresario role created successfully.")
 
