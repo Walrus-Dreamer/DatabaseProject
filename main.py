@@ -14,6 +14,7 @@ class Kernel:
         self.role = None
 
     def run(self):
+        # Инициализация БД
         gui = GUI()
         root_login, root_password = gui.connect_to_db_screen()
         db_initer = DbInitializer(root_login, root_password)
@@ -28,14 +29,28 @@ class Kernel:
         except mysql.connector.Error as error:
             print(f"Failed to initialize database: {error}")
 
-        username, password = gui.sign_in()
+        # Начало работы проекта
+        username, password, next_window_name = gui.sign_in()
         db_manager = DBManager(username=username, password=password)
         self.role = db_manager.get_my_role()
         gui.set_db_manager(db_manager)
 
-        next_window_name = "main_menu"
         while next_window_name != "exit":
             next_window_name = gui.handle_command(next_window_name, self.role)
+            if next_window_name == "change_user":
+                errors = True
+                while errors:
+                    try:
+                        gui = GUI()
+                        username, password, next_window_name = gui.sign_in()
+                        db_manager = DBManager(username=username, password=password)
+                        self.role = db_manager.get_my_role()
+                        gui.set_db_manager(db_manager)
+                        errors = False
+                    except mysql.connector.Error as error:
+                        print(f"Failed to sign in: {error}")
+                        pass
+                        # TODO: добавить окно с ошибкой.
 
         user_decision = input("Вы хотите очистить базу? (y/n): ")
         if user_decision == "y":

@@ -96,10 +96,28 @@ class GUI:
         self.current_window.title("Вход в систему")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
-        self.__open_login_window()
+        self.next_window_name = "main_menu"
+
+        self.username = None
+        self.password = None
+
+        sign_in_btn = tk.Button(
+            self.current_window,
+            text="Войти",
+            command=self.__open_login_window,
+        )
+        sign_in_btn.pack()
+
+        exit_btn = tk.Button(
+            self.current_window,
+            text="Завершить работу",
+            command=lambda: self.__set_next_window("exit"),
+        )
+        exit_btn.pack()
+
         self.current_window.mainloop()
 
-        return self.username, self.password
+        return self.username, self.password, self.next_window_name
 
     def get_role(self):
         return self.role
@@ -109,6 +127,7 @@ class GUI:
         self.current_window.destroy()
 
     def __main_menu(self, role):
+        # self.db_manager.create_user("another_user", "1", "event_manager_role")
         self.current_window = tk.Tk()
         self.current_window.title("Главное меню")
         self.current_window.geometry("1280x720")
@@ -118,11 +137,11 @@ class GUI:
         header_text = None
         match role:
             case "admin_role":
-                header_text = "Меню для зрителя"
+                header_text = "Меню для администратора БД"
             case "viewer_role":
                 header_text = "Меню для зрителя"
             case "event_manager_role":
-                header_text = "Меню для событий"
+                header_text = "Меню для менеджера событий"
             case "impresario_role":
                 header_text = "Меню для импресарио"
 
@@ -178,8 +197,8 @@ class GUI:
                 pass
         exit_btn = tk.Button(
             self.current_window,
-            text="Завершить работу",
-            command=lambda: self.__set_next_window("exit"),
+            text="Выйти из аккаунта",
+            command=lambda: self.__set_next_window("change_user"),
         )
         exit_btn.pack()
 

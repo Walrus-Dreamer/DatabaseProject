@@ -127,6 +127,14 @@ class DBManager:
             "SELECT role FROM username_role WHERE username_role.username like CURRENT_USER();"
         )
         self.role = self.cursor.fetchone()[0]
-        print("my role is: ", self.role)
-        # self.role = "event_manager"
         return self.role
+
+    def create_user(self, username, password, role):
+        self.cursor.execute(
+            f"INSERT INTO username_role VALUES ('{username}@localhost', '{role}');"
+        )
+        self.cursor.execute(
+            f"CREATE USER '{username}'@'localhost' IDENTIFIED BY '{password}';"
+        )
+        self.cursor.execute(f"GRANT SELECT ON theatre.* TO '{username}'@'localhost';")
+        self.cursor.execute(f"GRANT EXECUTE ON theatre.* TO '{username}'@'localhost';")
