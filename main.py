@@ -14,6 +14,7 @@ class Kernel:
         self.role = None
 
     def run(self):
+
         gui = GUI()
         root_login, root_password = gui.connect_to_db_screen()
         db_initer = DbInitializer(root_login, root_password)
