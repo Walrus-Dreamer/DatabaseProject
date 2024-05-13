@@ -75,7 +75,7 @@ class GUI:
         login_btn = tk.Button(
             self.current_window,
             text="Вход c вводом логина и пароля",
-            command=lambda: self.__open_login_window(has_root_window=True),
+            command=self.__open_login_window,
         )
         page_description_label.pack()
         default_login_btn.pack()
