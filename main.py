@@ -15,6 +15,7 @@ class Kernel:
 
     def run(self):
         # Инициализация БД
+        # TODO: Обернуть в цикл и повторять, пока не получим корректный пароль.
         gui = GUI()
         root_login, root_password = gui.connect_to_db_screen()
         db_initer = DbInitializer(root_login, root_password)
