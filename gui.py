@@ -115,95 +115,73 @@ class GUI:
         self.current_window.resizable(1, 1)
         self.next_window_name = "exit"
 
+        header_text = None
         match role:
+            case "admin_role":
+                header_text = "Меню для зрителя"
             case "viewer_role":
-                viewer_label = tk.Label(self.current_window, text="Меню для зрителя")
-                actors_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница актеров",
-                    command=lambda: self.__set_next_window("actors_page"),
-                )
-                events_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница событий",
-                    command=lambda: self.__set_next_window("events_page"),
-                )
-                impresarios_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница импресарио",
-                    command=lambda: self.__set_next_window("impresarios_page"),
-                )
-                buildings_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница зданий",
-                    command=lambda: self.__set_next_window("buildings_page"),
-                )
-                contests_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница конкурсов",
-                    command=lambda: self.__set_next_window("contests_page"),
-                )
-                exit_btn = tk.Button(
-                    self.current_window,
-                    text="Завершить работу",
-                    command=lambda: self.__set_next_window("exit"),
-                )
-
-                viewer_label.pack()
-                actors_page_btn.pack()
-                events_page_btn.pack()
-                impresarios_page_btn.pack()
-                buildings_page_btn.pack()
-                contests_page_btn.pack()
-                exit_btn.pack()
+                header_text = "Меню для зрителя"
             case "event_manager_role":
-                impresario_label = tk.Label(
-                    self.current_window, text="Меню для менеджера событий"
-                )
-                actors_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница актеров",
-                    command=lambda: self.__set_next_window("actors_page"),
-                )
-                events_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница событий",
-                    command=lambda: self.__set_next_window("events_page"),
-                )
-                impresarios_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница импресарио",
-                    command=lambda: self.__set_next_window("impresarios_page"),
-                )
-                buildings_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница зданий",
-                    command=lambda: self.__set_next_window("buildings_page"),
-                )
+                header_text = "Меню для событий"
+            case "impresario_role":
+                header_text = "Меню для импресарио"
+
+        header_label = tk.Label(self.current_window, text=header_text)
+        header_label.pack()
+
+        # Общие для всех кнопки:
+        actors_page_btn = tk.Button(
+            self.current_window,
+            text="Страница актеров",
+            command=lambda: self.__set_next_window("actors_page"),
+        )
+        events_page_btn = tk.Button(
+            self.current_window,
+            text="Страница событий",
+            command=lambda: self.__set_next_window("events_page"),
+        )
+        impresarios_page_btn = tk.Button(
+            self.current_window,
+            text="Страница импресарио",
+            command=lambda: self.__set_next_window("impresarios_page"),
+        )
+        buildings_page_btn = tk.Button(
+            self.current_window,
+            text="Страница зданий",
+            command=lambda: self.__set_next_window("buildings_page"),
+        )
+        contests_page_btn = tk.Button(
+            self.current_window,
+            text="Страница конкурсов",
+            command=lambda: self.__set_next_window("contests_page"),
+        )
+
+        actors_page_btn.pack()
+        events_page_btn.pack()
+        impresarios_page_btn.pack()
+        buildings_page_btn.pack()
+        contests_page_btn.pack()
+
+        match role:
+            case "admin_role":
+                pass
+            case "viewer_role":
+                pass
+            case "event_manager_role":
                 create_event_btn = tk.Button(
                     self.current_window,
                     text="Создать событие",
                     command=lambda: self.__set_next_window("create_event"),
                 )
-                contests_page_btn = tk.Button(
-                    self.current_window,
-                    text="Страница конкурсов",
-                    command=lambda: self.__set_next_window("contests_page"),
-                )
-                exit_btn = tk.Button(
-                    self.current_window,
-                    text="Завершить работу",
-                    command=lambda: self.__set_next_window("exit"),
-                )
-
-                impresario_label.pack()
-                actors_page_btn.pack()
-                events_page_btn.pack()
-                impresarios_page_btn.pack()
-                buildings_page_btn.pack()
                 create_event_btn.pack()
-                contests_page_btn.pack()
-                exit_btn.pack()
+            case "impresario_role":
+                pass
+        exit_btn = tk.Button(
+            self.current_window,
+            text="Завершить работу",
+            command=lambda: self.__set_next_window("exit"),
+        )
+        exit_btn.pack()
 
         self.current_window.mainloop()
         return self.next_window_name

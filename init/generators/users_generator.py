@@ -47,8 +47,12 @@ class UsersGenerator:
         cursor.execute("CREATE USER 'admin'@'localhost' IDENTIFIED BY '1';")
         cursor.execute("GRANT 'admin_role'@'localhost' TO 'admin'@'localhost';")
         cursor.execute("GRANT SUPER ON *.* TO 'admin'@'localhost';")
-        cursor.execute("GRANT ALL ON theatre.* TO 'admin'@'localhost';")
-        cursor.execute("GRANT EXECUTE ON theatre.* TO 'admin'@'localhost';")
+        cursor.execute(
+            "GRANT ALL ON theatre.* TO 'admin'@'localhost';"
+        )  # TODO: Убрать костыль
+        cursor.execute(
+            "GRANT EXECUTE ON theatre.* TO 'admin'@'localhost';"
+        )  # TODO: Убрать костыль
         if log:
             print("\t-Admin user created successfully.")
 
@@ -56,8 +60,12 @@ class UsersGenerator:
     def __add_viewer_user(cursor):
         cursor.execute("CREATE USER 'viewer'@'localhost' IDENTIFIED BY '1';")
         # cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'viewer'@'localhost';")
-        cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';")
+        cursor.execute(
+            "GRANT SELECT ON theatre.* TO 'viewer'@'localhost';"
+        )  # TODO: Убрать костыль
+        cursor.execute(
+            "GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';"
+        )  # TODO: Убрать костыль
         if log:
             print("\t-Viewer user created successfully.")
 
@@ -67,8 +75,12 @@ class UsersGenerator:
         # cursor.execute(
         #     "GRANT 'event_manager_role'@'localhost' TO 'event_manager'@'localhost';"
         # )
-        cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';")
-        cursor.execute("GRANT EXECUTE ON theatre.* TO 'event_manager'@'localhost';")
+        cursor.execute(
+            "GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';"
+        )  # TODO: Убрать костыль
+        cursor.execute(
+            "GRANT EXECUTE ON theatre.* TO 'event_manager'@'localhost';"
+        )  # TODO: Убрать костыль
         if log:
             print("\t-Event manager user created successfully.")
 
@@ -78,6 +90,12 @@ class UsersGenerator:
         cursor.execute(
             "GRANT 'impresario_role'@'localhost' TO 'impresario'@'localhost';"
         )
+        cursor.execute(
+            "GRANT SELECT ON theatre.* TO 'impresario'@'localhost';"
+        )  # TODO: Убрать костыль
+        cursor.execute(
+            "GRANT EXECUTE ON theatre.* TO 'impresario'@'localhost';"
+        )  # TODO: Убрать костыль
         if log:
             print("\t-Impresario user created successfully.")
 
