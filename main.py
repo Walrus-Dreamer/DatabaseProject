@@ -30,13 +30,8 @@ class Kernel:
             print(f"Failed to initialize database: {error}")
 
         # Начало работы проекта
-        username, password, next_window_name = gui.sign_in()
-        db_manager = DBManager(username=username, password=password)
-        self.role = db_manager.get_my_role()
-        gui.set_db_manager(db_manager)
-
+        next_window_name = "change_user"
         while next_window_name != "exit":
-            next_window_name = gui.handle_command(next_window_name, self.role)
             if next_window_name == "change_user":
                 errors = True
                 while errors:
@@ -51,6 +46,7 @@ class Kernel:
                         print(f"Failed to sign in: {error}")
                         pass
                         # TODO: добавить окно с ошибкой.
+            next_window_name = gui.handle_command(next_window_name, self.role)
 
         user_decision = input("Вы хотите очистить базу? (y/n): ")
         if user_decision == "y":
