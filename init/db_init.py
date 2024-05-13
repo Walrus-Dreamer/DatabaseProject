@@ -44,19 +44,3 @@ class DbInitializer:
     # def __del__(self):
     #     self.cursor.close()
     #     self.connector.close()
-
-    def drop_db(self):
-        self.connector = mysql.connector.connect(
-            host="localhost", user=self.username, password=self.password
-        )
-        self.connector.autocommit = True
-        self.cursor = self.connector.cursor()
-        if log:
-            print("\ndrop_db log:")
-        try:
-            self.cursor.execute("DROP DATABASE theatre")
-            if log:
-                print("\t-Database deleted successfully.")
-        except mysql.connector.Error as error:
-            if log:
-                print(f"\t-Dropping database failed: {error}.")

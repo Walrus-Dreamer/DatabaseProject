@@ -55,6 +55,7 @@ class RolesGenerator:
     def __add_viewer_role(cursor):
         cursor.execute("CREATE ROLE 'viewer_role'@'localhost';")
         cursor.execute("GRANT SELECT ON theatre.* TO 'viewer_role'@'localhost';")
+        cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer_role'@'localhost';")
         if log:
             print("\t-Viewer role created successfully.")
 
@@ -88,18 +89,28 @@ class RolesGenerator:
             print("\t-Impresario role created successfully.")
 
     @staticmethod
+    def __flush_privileges(cursor):
+        cursor.execute("FLUSH PRIVILEGES;")
+        if log:
+            print("\t-Priveleges flushed successfully.")
+
+    @staticmethod
     def create_default_roles(connector):
         cursor = connector.cursor()
         if log:
             print("\ncreate_default_roles log:")
         try:
             RolesGenerator.delete_roles(connector)
+            RolesGenerator.__flush_privileges(cursor)
+
             RolesGenerator.__add_admin_role(cursor)
             RolesGenerator.__add_viewer_role(cursor)
             RolesGenerator.__add_event_manager_role(cursor)
             RolesGenerator.__add_impresario_role(cursor)
+
+            RolesGenerator.__flush_privileges(cursor)
             if log:
-                print("\t-Roles created successfully.")
+                print("\t-Default roles created successfully.")
         except mysql.connector.Error as error:
             if log:
-                print("\t-Failed to create roles: {}".format(error))
+                print("\t-Failed to create default roles: {}".format(error))

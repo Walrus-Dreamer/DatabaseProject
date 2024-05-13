@@ -23,6 +23,7 @@ class GUI:
 
     def __open_login_window(self):
         login_window = tk.Toplevel(self.current_window)
+
         login_window.title("Вход")
 
         label_username = tk.Label(login_window, text="Логин:")
@@ -77,7 +78,7 @@ class GUI:
         login_btn = tk.Button(
             self.current_window,
             text="Вход c вводом логина и пароля",
-            command=self.__open_login_window,
+            command=lambda: self.__open_login_window(has_root_window=True),
         )
         page_description_label.pack()
         default_login_btn.pack()
@@ -93,29 +94,17 @@ class GUI:
         self.role = role_name
         self.current_window.destroy()
 
-    def select_role(self):
+    def sign_in(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Выбор роли")
+        self.current_window.title("Вход в систему")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
-
-        label = tk.Label(self.current_window, text="Выберите роль:")
-        assistant_btn = tk.Button(
-            self.current_window,
-            text="Зритель",
-            command=lambda: self.__pick_role("viewer"),
-        )
-        my_events_btn = tk.Button(
-            self.current_window,
-            text="Менеджер событий",
-            command=lambda: self.__pick_role("event_manager"),
-        )
-
-        label.pack()
-        assistant_btn.pack()
-        my_events_btn.pack()
-
+        self.__open_login_window()
         self.current_window.mainloop()
+
+        return self.username, self.password
+
+    def get_role(self):
         return self.role
 
     def __set_next_window(self, next_window_name):

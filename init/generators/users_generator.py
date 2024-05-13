@@ -3,27 +3,103 @@ import mysql.connector
 log = True
 
 
-class UserGenerator:
+class UsersGenerator:
     @staticmethod
-    def __create_db_admin(cursor):
-        cursor.execute("CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';")
+    def delete_users(connector):
+        cursor = connector.cursor()
+        try:
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'admin';")
+            cursor.execute("DROP USER 'admin'@'localhost';")
+            if log:
+                print("\t-admin deleted successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print("\t-Error: {}".format(error))
+        try:
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'viewer';")
+            cursor.execute("DROP USER 'viewer'@'localhost';")
+            if log:
+                print("\t-viewer deleted successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print("\t-Error: {}".format(error))
+        try:
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'event_manager';")
+            cursor.execute("DROP USER 'event_manager'@'localhost';")
+            if log:
+                print("\t-event_manager deleted successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print("\t-Error: {}".format(error))
+        try:
+            cursor.execute("DELETE FROM mysql.user WHERE User LIKE 'impresario';")
+            cursor.execute("DROP USER 'impresario'@'localhost';")
+            if log:
+                print("\t-impresario deleted successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print("\t-Error: {}".format(error))
+
+        cursor.execute("FLUSH PRIVILEGES;")
+
+    @staticmethod
+    def __add_admin_user(cursor):
+        cursor.execute("CREATE USER 'admin'@'localhost' IDENTIFIED BY '1';")
+        cursor.execute("GRANT 'admin_role'@'localhost' TO 'admin'@'localhost';")
+        cursor.execute("GRANT SUPER ON *.* TO 'admin'@'localhost';")
+        if log:
+            print("\t-Admin user created successfully.")
+
+    @staticmethod
+    def __add_viewer_user(cursor):
+        cursor.execute("CREATE USER 'viewer'@'localhost' IDENTIFIED BY '1';")
+        cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
+        cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';")
+        if log:
+            print("\t-Viewer user created successfully.")
+
+    @staticmethod
+    def __add_event_manager_user(cursor):
+        cursor.execute("CREATE USER 'event_manager'@'localhost' IDENTIFIED BY '1';")
+        cursor.execute(
+            "GRANT 'event_manager_role'@'localhost' TO 'event_manager'@'localhost';"
+        )
+        if log:
+            print("\t-Event manager user created successfully.")
+
+    @staticmethod
+    def __add_impresario_user(cursor):
+        cursor.execute("CREATE USER 'impresario'@'localhost' IDENTIFIED BY '1';")
+        cursor.execute(
+            "GRANT 'impresario_role'@'localhost' TO 'impresario'@'localhost';"
+        )
+        if log:
+            print("\t-Impresario user created successfully.")
+
+    @staticmethod
+    def __flush_privileges(cursor):
+        cursor.execute("FLUSH PRIVILEGES;")
+        if log:
+            print("\t-Priveleges flushed successfully.")
 
     @staticmethod
     def create_default_users(connector):
         cursor = connector.cursor()
         if log:
-            print("\ncreate_users log:")
+            print("\ncreate_default_users log:")
         try:
-            cursor.execute("CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';")
-            cursor.execute("CREATE USER 'viewer'@'localhost' IDENTIFIED BY 'viewer';")
-            cursor.execute(
-                "CREATE USER 'event_manager'@'localhost' IDENTIFIED BY 'event_manager';"
-            )
-            cursor.execute(
-                "CREATE USER 'impresario'@'localhost' IDENTIFIED BY 'impresario';"
-            )
+            UsersGenerator.delete_users(connector)
+
+            UsersGenerator.__flush_privileges(cursor)
+
+            UsersGenerator.__add_admin_user(cursor)
+            UsersGenerator.__add_viewer_user(cursor)
+            UsersGenerator.__add_event_manager_user(cursor)
+            UsersGenerator.__add_impresario_user(cursor)
+
+            UsersGenerator.__flush_privileges(cursor)
             if log:
-                print("\t-Users created successfully.")
+                print("\t-Default users created successfully.")
         except mysql.connector.Error as error:
             if log:
-                print("\t-Failed to create users: {}".format(error))
+                print("\t-Failed to create default users: {}".format(error))

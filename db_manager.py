@@ -4,8 +4,14 @@ log = True
 
 
 class DBManager:
-    def __init__(self, connector):
-        self.cursor = connector.cursor()
+    def __init__(self, username="root", password=None):
+        self.username = username
+        self.password = password
+        self.connector = mysql.connector.connect(
+            host="localhost", user=username, password=password, database="theatre"
+        )
+        self.connector.autocommit = True
+        self.cursor = self.connector.cursor()
 
     def select_all_from(self, table_name):
         # TODO: add make this function in db
@@ -95,3 +101,30 @@ class DBManager:
             print(result)
             result += repr(row) + "\n"
         return result
+
+    def drop_db(self):
+        self.connector = mysql.connector.connect(
+            host="localhost", user=self.username, password=self.password
+        )
+        self.connector.autocommit = True
+        self.cursor = self.connector.cursor()
+        if log:
+            print("\ndrop_db log:")
+        try:
+            self.cursor.execute("DROP DATABASE theatre")
+            if log:
+                print("\t-Database deleted successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(f"\t-Dropping database failed: {error}.")
+
+    def __get_my_username(self):
+        self.cursor.execute("SELECT get_my_username();")
+        return self.cursor.fetchone()[0]
+
+    def get_my_role(self):
+        self.cursor.execute(f"SELECT get_my_role();")
+        # TODO: Починить определение ролей. Проблема в том, что роль по какой-то причине не дает пользователю никаких привилегий.
+        # self.role = self.cursor.fetchone()[0]
+        self.role = "event_manager"
+        return self.role

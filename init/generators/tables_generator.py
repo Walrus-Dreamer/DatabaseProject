@@ -193,9 +193,22 @@ class TablesGenerator:
                     f"\t-Trigger 'set_contest_creation_date' was not created due to: {error}."
                 )
 
+    @staticmethod
+    def __trust_function_creators(cursor):
+        try:
+            cursor.execute("SET GLOBAL log_bin_trust_function_creators = 1;")
+            if log:
+                print("\t-Variable 'log_bin_trust_function_creators' set to 1.")
+        except mysql.connector.Error as error:
+            if log:
+                print(
+                    f"\t-Variable 'log_bin_trust_function_creators' was not set to 1 due to: {error}."
+                )
+
     # TODO: вынести генерацию каждой процедуры в отдельную функцию
     @staticmethod
     def __add_functions(cursor):
+        TablesGenerator.__trust_function_creators(cursor)
         try:
             cursor.execute(
                 """
@@ -209,6 +222,11 @@ class TablesGenerator:
             )
             if log:
                 print("\t-Function 'get_impresario_count' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(f"\t-Failed to create function: {error}.")
+
+        try:
             cursor.execute(
                 """
                            CREATE FUNCTION get_genre_by_name(genre_name VARCHAR(255)) RETURNS VARCHAR(255) DETERMINISTIC
@@ -223,7 +241,41 @@ class TablesGenerator:
                 print("\t-Function 'get_genre_by_name' created successfully.")
         except mysql.connector.Error as error:
             if log:
-                print(f"\t-Failed to create functions: {error}.")
+                print(f"\t-Failed to create function: {error}.")
+
+        try:
+            cursor.execute(
+                """
+                           CREATE FUNCTION get_my_username() RETURNS VARCHAR(255) NOT DETERMINISTIC
+                                BEGIN
+                                    DECLARE username VARCHAR(50);
+                                    SELECT CURRENT_USER() INTO username;
+                                    RETURN username;
+                                END
+                           """
+            )
+            if log:
+                print("\t-Function 'get_my_username' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(f"\t-Failed to create function: {error}.")
+
+        try:
+            cursor.execute(
+                """
+                           CREATE FUNCTION get_my_role() RETURNS VARCHAR(255) NOT DETERMINISTIC
+                                BEGIN
+                                    DECLARE users_role VARCHAR(255);
+                                    SELECT role INTO users_role FROM username_role WHERE username_role.username like CURRENT_USER();
+                                    RETURN users_role;
+                                END
+                           """
+            )
+            if log:
+                print("\t-Function 'get_role_by_username' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(f"\t-Failed to create function: {error}.")
 
     @staticmethod
     def __add_procedures(cursor):
@@ -407,7 +459,19 @@ class TablesGenerator:
                             )"""
         )
         if log:
-            print("\t-Table 'impresario_genre_link' created successfully.")
+            print("\t-Table 'contest' created successfully.")
+
+    @staticmethod
+    def __create_username_role_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS username_role (
+                                username VARCHAR(255) PRIMARY KEY,
+                                role VARCHAR(255)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'username_role' created successfully.")
 
     @staticmethod
     def create_tables(connector):
@@ -423,6 +487,7 @@ class TablesGenerator:
             TablesGenerator.__create_actor_genre_link_table(cursor)
             TablesGenerator.__create_impresario_genre_link_table(cursor)
             TablesGenerator.__create_contest_table(cursor)
+            TablesGenerator.__create_username_role_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))

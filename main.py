@@ -2,7 +2,7 @@ from init.db_init import DbInitializer
 from init.generators.dump_generator import DumpGenerator
 from init.generators.roles_generator import RolesGenerator
 from init.generators.tables_generator import TablesGenerator
-from init.generators.users_generator import UserGenerator
+from init.generators.users_generator import UsersGenerator
 from db_manager import DBManager
 
 from gui import GUI
@@ -14,7 +14,6 @@ class Kernel:
         self.role = None
 
     def run(self):
-
         gui = GUI()
         root_login, root_password = gui.connect_to_db_screen()
         db_initer = DbInitializer(root_login, root_password)
@@ -24,13 +23,14 @@ class Kernel:
             TablesGenerator.create_procedures(db_initer.connector)
             TablesGenerator.create_functions(db_initer.connector)
             RolesGenerator.create_default_roles(db_initer.connector)
-            # UserGenerator.create_default_users(db_initer.connector)
+            UsersGenerator.create_default_users(db_initer.connector)
             DumpGenerator.create_dump(db_initer.connector)
         except mysql.connector.Error as error:
-            print(f"Failed to generate data: {error}")
+            print(f"Failed to initialize database: {error}")
 
-        self.role = gui.select_role()
-        db_manager = DBManager(db_initer.connector)
+        username, password = gui.sign_in()
+        db_manager = DBManager(username=username, password=password)
+        self.role = db_manager.get_my_role()
         gui.set_db_manager(db_manager)
 
         next_window_name = "main_menu"
@@ -39,8 +39,10 @@ class Kernel:
 
         user_decision = input("Вы хотите очистить базу? (y/n): ")
         if user_decision == "y":
-            RolesGenerator.delete_roles(db_initer.connector)
-            db_initer.drop_db()
+            RolesGenerator.delete_roles(db_manager.connector)
+            UsersGenerator.delete_users(db_manager.connector)
+
+            db_manager.drop_db()
 
 
 kernel = Kernel()

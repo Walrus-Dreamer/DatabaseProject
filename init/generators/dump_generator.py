@@ -146,7 +146,7 @@ class DumpGenerator:
                             (9, 'Фантастика'),
                             (10, 'Научно-популярный'),
                             (11, 'Мюзикл'),
-                            (12, 'Анимация')
+                            (12, 'Анимация');
                         """
         )
         if log:
@@ -185,7 +185,7 @@ class DumpGenerator:
                             (4, 'Фантастика'),
                             (1, 'Научно-популярный'),
                             (5, 'Мюзикл'),
-                            (1, 'Анимация')
+                            (1, 'Анимация');
                         """
         )
         if log:
@@ -198,11 +198,26 @@ class DumpGenerator:
                         INSERT INTO contest (name, first_place_id, second_place_id, third_place_id) VALUES
                             ('Мисс вселенная', 3, 5, 8),
                             ('Лучшая роль первого плана', 1, 2, 3),
-                            ('Лучшая роль второго плана', 6, 7, 8)
+                            ('Лучшая роль второго плана', 6, 7, 8);
                         """
         )
         if log:
-            print("\t-Actor_genre_link dump created successfully.")
+            print("\t-Contests dump created successfully.")
+
+    @staticmethod
+    def __insert_username_roles(cursor):
+        cursor.execute(
+            """
+                        INSERT INTO username_role (username, role) VALUES
+                            ('root@localhost', 'root_role'),
+                            ('admin@localhost', 'admin_role'),
+                            ('viewer@localhost', 'viewer_role'),
+                            ('event_manager@localhost', 'event_manager_role'),
+                            ('impresario@localhost', 'impresario_role');
+                        """
+        )
+        if log:
+            print("\t-Username_roles dump created successfully.")
 
     @staticmethod
     def create_dump(connector):
@@ -218,6 +233,7 @@ class DumpGenerator:
             DumpGenerator.__insert_actor_genre_links(cursor)
             DumpGenerator.__insert_impresario_genre_links(cursor)
             DumpGenerator.__insert_contests(cursor)
+            DumpGenerator.__insert_username_roles(cursor)
             if log:
                 print("\t-Dump created successfully.")
         except mysql.connector.Error as error:
