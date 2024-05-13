@@ -1,10 +1,9 @@
-from glebglebglebglebgleb_part3 import (
-    DbInitializer,
-    TablesGenerator,
-    DumpGenerator,
-    RolesGenerator,
-    DBManager,
-)
+from init.db_init import DbInitializer
+from init.generators.dump_generator import DumpGenerator
+from init.generators.roles_generator import RolesGenerator
+from init.generators.tables_generator import TablesGenerator
+from db_manager import DBManager
+
 from gui import GUI
 import mysql
 
