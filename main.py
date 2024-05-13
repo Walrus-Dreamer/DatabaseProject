@@ -2,6 +2,7 @@ from glebglebglebglebgleb_part3 import (
     DbInitializer,
     TablesGenerator,
     DumpGenerator,
+    RolesGenerator,
     DBManager,
 )
 from gui import GUI
@@ -14,13 +15,14 @@ class Kernel:
 
     def run(self):
         gui = GUI()
-        login, password = gui.connect_to_db_screen()
-        db_initer = DbInitializer(login, password)
+        root_login, root_password = gui.connect_to_db_screen()
+        db_initer = DbInitializer(root_login, root_password)
         try:
             TablesGenerator.create_tables(db_initer.connector)
             TablesGenerator.create_triggers(db_initer.connector)
             TablesGenerator.create_procedures(db_initer.connector)
             TablesGenerator.create_functions(db_initer.connector)
+            RolesGenerator.create_roles(db_initer.connector)
             DumpGenerator.create_dump(db_initer.connector)
         except mysql.connector.Error as error:
             print(f"Failed to generate data: {error}")

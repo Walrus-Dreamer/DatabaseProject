@@ -65,14 +65,21 @@ class GUI:
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
 
+        page_description_label = tk.Label(
+            self.current_window,
+            text="На данной странице необходимо подключиться к БД как root пользователь. После этого будет создан администратор БД.",
+        )
         default_login_btn = tk.Button(
-            self.current_window, text="Вход по умолчанию", command=self.__default_login
+            self.current_window,
+            text="Вход по умолчанию (логин: root, без пароля).",
+            command=self.__default_login,
         )
         login_btn = tk.Button(
             self.current_window,
             text="Вход c вводом логина и пароля",
             command=self.__open_login_window,
         )
+        page_description_label.pack()
         default_login_btn.pack()
         login_btn.pack()
 
