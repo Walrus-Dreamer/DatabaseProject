@@ -16,11 +16,17 @@ log = True
 
 
 class DbInitializer:
-    def __init__(self, username="root", password=None):
+    def __init__(self, username="root", password=None, host="localhost", port=3306):
+        # Костыль. TODO: не передавать сюда пустые строки, если хост и порт не были указаны.
+        if host == "":
+            host = "localhost"
+        if port == "":
+            port = 3306
+        print(f"username: {username}, password: {password}, host: {host}, port: {port}")
         self.username = username
         self.password = password
         connector = mysql.connector.connect(
-            host="localhost", user=username, password=password
+            host=host, user=username, password=password, port=port
         )
         connector.autocommit = True
         cursor = connector.cursor()
@@ -35,7 +41,7 @@ class DbInitializer:
                 print("\t-Database already exists.")
 
         self.connector = mysql.connector.connect(
-            host="localhost", user="root", password=password, database="theatre"
+            host=host, user=username, password=password, port=port, database="theatre"
         )
         self.connector.autocommit = True
         self.cursor = self.connector.cursor()

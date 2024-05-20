@@ -16,19 +16,25 @@ class Kernel:
     def run(self):
         # Инициализация БД
         # TODO: Обернуть в цикл и повторять, пока не получим корректный пароль.
-        gui = GUI()
-        root_login, root_password = gui.connect_to_db_screen()
-        db_initer = DbInitializer(root_login, root_password)
-        try:
-            TablesGenerator.create_tables(db_initer.connector)
-            TablesGenerator.create_triggers(db_initer.connector)
-            TablesGenerator.create_procedures(db_initer.connector)
-            TablesGenerator.create_functions(db_initer.connector)
-            RolesGenerator.create_default_roles(db_initer.connector)
-            UsersGenerator.create_default_users(db_initer.connector)
-            DumpGenerator.create_dump(db_initer.connector)
-        except mysql.connector.Error as error:
-            print(f"Failed to initialize database: {error}")
+        login_accepted = False
+        while not login_accepted:
+            try:
+                gui = GUI()
+                root_login, root_password, host, port = gui.connect_to_db_screen()
+                db_initer = DbInitializer(root_login, root_password, host, port)
+                login_accepted = True
+                try:
+                    TablesGenerator.create_tables(db_initer.connector)
+                    TablesGenerator.create_triggers(db_initer.connector)
+                    TablesGenerator.create_procedures(db_initer.connector)
+                    TablesGenerator.create_functions(db_initer.connector)
+                    RolesGenerator.create_default_roles(db_initer.connector)
+                    UsersGenerator.create_default_users(db_initer.connector)
+                    DumpGenerator.create_dump(db_initer.connector)
+                except mysql.connector.Error as error:
+                    print(f"Failed to initialize database: {error}")
+            except mysql.connector.Error as error:
+                print(f"Failed to connect to database: {error}")
 
         # Начало работы проекта
         next_window_name = "change_user"

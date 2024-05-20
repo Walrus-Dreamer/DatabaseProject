@@ -15,9 +15,13 @@ class GUI:
         self.password = None
         self.current_window.destroy()
 
-    def __submit(self, login_window, entry_username, entry_password):
+    def __submit(
+        self, login_window, entry_username, entry_password, entry_host, entry_port
+    ):
         self.username = entry_username.get()
         self.password = entry_password.get()
+        self.host = entry_host.get()
+        self.port = entry_port.get()
         login_window.destroy()
         self.current_window.destroy()
 
@@ -38,6 +42,18 @@ class GUI:
         entry_password = tk.Entry(login_window, show="*")
         entry_password.pack()
 
+        label_host = tk.Label(login_window, text="Хост:")
+        label_host.pack()
+
+        entry_host = tk.Entry(login_window)
+        entry_host.pack()
+
+        label_port = tk.Label(login_window, text="Порт:")
+        label_port.pack()
+
+        entry_port = tk.Entry(login_window)
+        entry_port.pack()
+
         button_submit = tk.Button(
             login_window,
             text="Войти",
@@ -45,6 +61,8 @@ class GUI:
                 login_window=login_window,
                 entry_username=entry_username,
                 entry_password=entry_password,
+                entry_host=entry_host,
+                entry_port=entry_port,
             ),
         )
 
@@ -82,7 +100,7 @@ class GUI:
         login_btn.pack()
 
         self.current_window.mainloop()
-        return self.username, self.password
+        return self.username, self.password, self.host, self.port
 
     def set_db_manager(self, db_manager):
         self.db_manager = db_manager
