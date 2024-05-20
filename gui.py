@@ -349,6 +349,7 @@ class GUI:
         table = ttk.Treeview(
             self.current_window,
             columns=(
+                "Building name",
                 "Event name",
                 "Genre name",
                 "Impresario name",
@@ -357,18 +358,72 @@ class GUI:
             ),
         )
         table["show"] = "headings"
-        table.heading("Event name", text="Название события")
-        table.heading("Genre name", text="Название жанра")
+        table.heading("Building name", text="Место проведения")
+        table.heading("Event name", text="Название")
+        table.heading("Genre name", text="Жанр")
         table.heading("Impresario name", text="Имя импресарио")
         table.heading("Impresario surname", text="Фамилия импресарио")
         table.heading("Creation Date", text="Дата создания записи")
 
-        # Вставка данных в таблицу
-        for row in events:
-            table.insert("", "end", values=row[1:])  # Не отображаем id
-
         # Размещение таблицы на окне
         table.pack()
+
+        # Фильтрация событий
+        genres = [genre[0] for genre in self.db_manager.select_genres()]
+        genres.append("Любой")
+        genres = genres[::-1]
+
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
+        buildings.append("Любое")
+        buildings = buildings[::-1]
+
+        genre_label = tk.Label(self.current_window, text="Жанр:")
+        genre_label.pack()
+        genre_combobox = ttk.Combobox(
+            self.current_window, values=genres, state="readonly"
+        )
+        genre_combobox.current(0)
+        genre_combobox.pack()
+
+        building_label = tk.Label(self.current_window, text="Место работы:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            self.current_window, values=buildings, state="readonly"
+        )
+        building_combobox.current(0)
+        building_combobox.pack()
+
+        def filter_events():
+            building_filter = building_combobox.get()
+            genre_filter = genre_combobox.get()
+
+            def filter_by_building(event):
+                if building_filter == "Любое" or event[1] == building_filter:
+                    return True
+                return False
+
+            def filter_by_genre(event):
+                if genre_filter == "Любой" or event[3] == genre_filter:
+                    return True
+                return False
+
+            events = self.db_manager.select_events()
+            events = filter(filter_by_genre, events)
+            events = filter(filter_by_building, events)
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            # Вставка отфильтрованных данных в таблицу
+            for row in events:
+                table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(
+            self.current_window,
+            text="Поиск",
+            command=filter_events,
+        )
+        accept_btn.pack()
 
         main_menu_button = tk.Button(
             self.current_window,

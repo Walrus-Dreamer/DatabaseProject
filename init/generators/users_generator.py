@@ -49,7 +49,7 @@ class UsersGenerator:
         cursor.execute("GRANT SUPER ON *.* TO 'admin'@'localhost';")
         if log:
             cursor.execute(
-                "GRANT ALL ON theatre.* TO 'admin'@'localhost'  WITH GRANT OPTION;"
+                "GRANT ALL ON infosystem.* TO 'admin'@'localhost'  WITH GRANT OPTION;"
             )
             cursor.execute("GRANT EXECUTE ON *.* TO 'admin'@'localhost';")
             cursor.execute(
@@ -63,8 +63,8 @@ class UsersGenerator:
         cursor.execute("CREATE USER 'viewer'@'localhost' IDENTIFIED BY '1';")
         # cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
         if log:
-            cursor.execute("GRANT SELECT ON theatre.* TO 'viewer'@'localhost';")
-            cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';")
+            cursor.execute("GRANT SELECT ON infosystem.* TO 'viewer'@'localhost';")
+            cursor.execute("GRANT EXECUTE ON infosystem.* TO 'viewer'@'localhost';")
         if log:
             print("\t-Viewer user created successfully.")
 
@@ -75,8 +75,12 @@ class UsersGenerator:
         #     "GRANT 'event_manager_role'@'localhost' TO 'event_manager'@'localhost';"
         # )
         if log:
-            cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';")
-            cursor.execute("GRANT EXECUTE ON theatre.* TO 'event_manager'@'localhost';")
+            cursor.execute(
+                "GRANT SELECT ON infosystem.* TO 'event_manager'@'localhost';"
+            )
+            cursor.execute(
+                "GRANT EXECUTE ON infosystem.* TO 'event_manager'@'localhost';"
+            )
         if log:
             print("\t-Event manager user created successfully.")
 
@@ -87,8 +91,8 @@ class UsersGenerator:
             "GRANT 'impresario_role'@'localhost' TO 'impresario'@'localhost';"
         )
         if log:
-            cursor.execute("GRANT SELECT ON theatre.* TO 'impresario'@'localhost';")
-            cursor.execute("GRANT EXECUTE ON theatre.* TO 'impresario'@'localhost';")
+            cursor.execute("GRANT SELECT ON infosystem.* TO 'impresario'@'localhost';")
+            cursor.execute("GRANT EXECUTE ON infosystem.* TO 'impresario'@'localhost';")
         if log:
             print("\t-Impresario user created successfully.")
 

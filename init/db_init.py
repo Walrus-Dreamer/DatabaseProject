@@ -34,7 +34,7 @@ class DbInitializer:
         if log:
             print("\ndb_initer log:")
         try:
-            cursor.execute("CREATE DATABASE IF NOT EXISTS theatre")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS infosystem")
             if log:
                 print("\t-Database created successfully.")
         except mysql.connector.Error:
@@ -42,7 +42,11 @@ class DbInitializer:
                 print("\t-Database already exists.")
 
         self.connector = mysql.connector.connect(
-            host=host, user=username, password=password, port=port, database="theatre"
+            host=host,
+            user=username,
+            password=password,
+            port=port,
+            database="infosystem",
         )
         self.connector.autocommit = True
         self.cursor = self.connector.cursor()

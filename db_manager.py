@@ -8,7 +8,7 @@ class DBManager:
         self.username = username
         self.password = password
         self.connector = mysql.connector.connect(
-            host="localhost", user=username, password=password, database="theatre"
+            host="localhost", user=username, password=password, database="infosystem"
         )
         self.connector.autocommit = True
         self.cursor = self.connector.cursor()
@@ -43,13 +43,15 @@ class DBManager:
         self.cursor.execute(
             """
                             SELECT event.id,
-                                    event.name,
-                                    event.genre_name,
+                                    building.name as building_name,
+                                    event.name as event_name,
+                                    event.genre_name as genre_name,
                                     impresario.name as impresario_name,
                                     impresario.surname as impresario_surname,
                                     event.creation_date
                             FROM event
                             JOIN impresario ON event.impresario_id = impresario.id
+                            JOIN building ON impresario.building_id = building.id
                             """
         )
         return self.cursor.fetchall()
@@ -116,7 +118,7 @@ class DBManager:
         if log:
             print("\ndrop_db log:")
         try:
-            self.cursor.execute("DROP DATABASE theatre")
+            self.cursor.execute("DROP DATABASE infosystem")
             if log:
                 print("\t-Database deleted successfully.")
         except mysql.connector.Error as error:
@@ -141,5 +143,9 @@ class DBManager:
         self.cursor.execute(
             f"CREATE USER '{username}'@'localhost' IDENTIFIED BY '{password}';"
         )
-        self.cursor.execute(f"GRANT SELECT ON theatre.* TO '{username}'@'localhost';")
-        self.cursor.execute(f"GRANT EXECUTE ON theatre.* TO '{username}'@'localhost';")
+        self.cursor.execute(
+            f"GRANT SELECT ON infosystem.* TO '{username}'@'localhost';"
+        )
+        self.cursor.execute(
+            f"GRANT EXECUTE ON infosystem.* TO '{username}'@'localhost';"
+        )

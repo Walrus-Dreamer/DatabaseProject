@@ -47,27 +47,29 @@ class RolesGenerator:
     @staticmethod
     def __add_admin_role(cursor):
         cursor.execute("CREATE ROLE 'admin_role'@'localhost';")
-        cursor.execute("GRANT ALL ON theatre.* TO 'admin_role'@'localhost';")
+        cursor.execute("GRANT ALL ON infosystem.* TO 'admin_role'@'localhost';")
         if log:
             print("\t-Admin role created successfully.")
 
     @staticmethod
     def __add_viewer_role(cursor):
         cursor.execute("CREATE ROLE 'viewer_role'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'viewer_role'@'localhost';")
-        cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer_role'@'localhost';")
+        cursor.execute("GRANT SELECT ON infosystem.* TO 'viewer_role'@'localhost';")
+        cursor.execute("GRANT EXECUTE ON infosystem.* TO 'viewer_role'@'localhost';")
         if log:
             print("\t-Viewer role created successfully.")
 
     @staticmethod
     def __add_event_manager_role(cursor):
         cursor.execute("CREATE ROLE 'event_manager_role'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager_role'@'localhost';")
         cursor.execute(
-            "GRANT INSERT ON theatre.event TO 'event_manager_role'@'localhost';"
+            "GRANT SELECT ON infosystem.* TO 'event_manager_role'@'localhost';"
         )
         cursor.execute(
-            "GRANT UPDATE ON theatre.event TO 'event_manager_role'@'localhost';"
+            "GRANT INSERT ON infosystem.event TO 'event_manager_role'@'localhost';"
+        )
+        cursor.execute(
+            "GRANT UPDATE ON infosystem.event TO 'event_manager_role'@'localhost';"
         )
         if log:
             print("\t-Event manager role created successfully.")
@@ -75,15 +77,15 @@ class RolesGenerator:
     @staticmethod
     def __add_impresario_role(cursor):
         cursor.execute("CREATE ROLE 'impresario_role'@'localhost';")
-        cursor.execute("GRANT SELECT ON theatre.* TO 'impresario_role'@'localhost';")
+        cursor.execute("GRANT SELECT ON infosystem.* TO 'impresario_role'@'localhost';")
         cursor.execute(
-            "GRANT INSERT ON theatre.event TO 'impresario_role'@'localhost';"
+            "GRANT INSERT ON infosystem.event TO 'impresario_role'@'localhost';"
         )
         cursor.execute(
-            "GRANT INSERT ON theatre.contest TO 'impresario_role'@'localhost';"
+            "GRANT INSERT ON infosystem.contest TO 'impresario_role'@'localhost';"
         )
         cursor.execute(
-            "GRANT UPDATE ON theatre.event TO 'impresario_role'@'localhost';"
+            "GRANT UPDATE ON infosystem.event TO 'impresario_role'@'localhost';"
         )
         if log:
             print("\t-Impresario role created successfully.")

@@ -23,9 +23,9 @@ brew services start mysql
 **ВАЖНО!** Данный запрос удалит все роли и всех пользователей, кроме системных, а также удалит БД.
 
 ```sh
-mysql> USE theatre;
+mysql> USE infosystem;
 mysql> DELETE FROM mysql.user WHERE User NOT LIKE 'root' AND User NOT LIKE 'mysql%';
-mysql> DROP DATABASE theatre;
+mysql> DROP DATABASE infosystem;
 ```
 
 # **Проверка лабораторной работы в терминале**
@@ -41,7 +41,7 @@ mysql> SELECT Host, User FROM mysql.user;
 Так можно посмотреть хранимые процедуры, созданные в рамках данного проекта (при условии, что вы не очищали базу после завершения работы программы).
 
 ```sh
-mysql> SHOW PROCEDURE STATUS WHERE db='theatre';
+mysql> SHOW PROCEDURE STATUS WHERE db='infosystem';
 ```
 
 ## **Проверка хранимых функций в терминале**
@@ -49,7 +49,7 @@ mysql> SHOW PROCEDURE STATUS WHERE db='theatre';
 Так можно посмотреть хранимые функции, созданные в рамках данного проекта (при условии, что вы не очищали базу после завершения работы программы).
 
 ```sh
-mysql> use theatre;
+mysql> use infosystem;
 mysql> SHOW FUNCTION STATUS;
 ```
 
