@@ -18,9 +18,9 @@ log = True
 class DbInitializer:
     def __init__(self, username="root", password=None, host="localhost", port=3306):
         # Костыль. TODO: не передавать сюда пустые строки, если хост и порт не были указаны.
-        if host == "":
+        if host == "" or not host:
             host = "localhost"
-        if port == "":
+        if port == "" or not port:
             port = 3306
         else:
             port = int(port)

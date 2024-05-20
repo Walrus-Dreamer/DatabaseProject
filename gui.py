@@ -9,6 +9,10 @@ class GUI:
         self.current_window = None
         self.next_window_name = None
         self.db_manager = None
+        self.username = None
+        self.password = None
+        self.host = None
+        self.port = None
 
     def __default_login(self):
         self.username = "root"
@@ -245,7 +249,12 @@ class GUI:
 
         match role:
             case "admin_role":
-                pass
+                create_user_btn = tk.Button(
+                    self.current_window,
+                    text="Создание пользователя",
+                    command=lambda: self.__set_next_window("create_user"),
+                )
+                create_user_btn.pack()
             case "viewer_role":
                 pass
             case "event_manager_role":
@@ -491,7 +500,7 @@ class GUI:
             self.current_window.destroy()
         return "main_menu"
 
-    def __create_event(self):
+    def __create_event_page(self):
         self.current_window = tk.Tk()
         self.current_window.title("Добавление события")
         self.current_window.geometry("1280x720")
@@ -550,6 +559,80 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def error_modal(self, error_message="Неизвестная ошибка"):
+        error_window = tk.Toplevel(self.current_window)
+        error_window.title("Ошибка!")
+
+        error_message_label = tk.Label(error_window, text=error_message)
+        error_message_label.pack()
+
+        ok_btn = tk.Button(
+            error_window,
+            text="Ок",
+            command=error_window.destroy,
+        )
+        ok_btn.pack()
+
+        error_window.mainloop()
+
+    def __create_user_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление пользователя")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        username_label = tk.Label(self.current_window, text="Логин пользователя:")
+        username_label.pack()
+        username_entry = tk.Entry(self.current_window)
+        username_entry.pack()
+
+        password_label = tk.Label(self.current_window, text="Пароль пользователя:")
+        password_label = tk.Label(self.current_window, text="Пароль пользователя:")
+        password_label.pack()
+        password_entry = tk.Entry(self.current_window, show="*")
+        password_entry.pack()
+
+        verify_password_label = tk.Label(
+            self.current_window, text="Введите пароль еще раз:"
+        )
+        verify_password_label.pack()
+        verify_password_entry = tk.Entry(self.current_window, show="*")
+        verify_password_entry.pack()
+
+        roles = ["viewer_role", "event_manager_role", "impresario_role"]
+        role_label = tk.Label(self.current_window, text="Роль пользователя:")
+        role_label.pack()
+        role_combobox = ttk.Combobox(
+            self.current_window, values=roles, state="readonly"
+        )
+        role_combobox.pack()
+
+        def submit():
+            username = username_entry.get()
+            password = password_entry.get()
+            verify_password = verify_password_entry.get()
+            role = role_combobox.get()
+
+            if password != verify_password:
+                self.error_modal("Пароли не совпадают.")
+                return
+
+            self.db_manager.create_user(username, password, role)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Создать", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def handle_command(self, command, role):
         next_window = "exit"
         match command:
@@ -564,7 +647,9 @@ class GUI:
             case "buildings_page":
                 next_window = self.__buildings_page()
             case "create_event":
-                next_window = self.__create_event()
+                next_window = self.__create_event_page()
+            case "create_user":
+                next_window = self.__create_user_page()
             case "contests_page":
                 next_window = self.__contests_page()
         return next_window

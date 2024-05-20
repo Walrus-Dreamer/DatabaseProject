@@ -48,9 +48,13 @@ class UsersGenerator:
         cursor.execute("GRANT 'admin_role'@'localhost' TO 'admin'@'localhost';")
         cursor.execute("GRANT SUPER ON *.* TO 'admin'@'localhost';")
         if log:
-            cursor.execute("GRANT ALL ON theatre.* TO 'admin'@'localhost';")
-        if log:
-            cursor.execute("GRANT EXECUTE ON theatre.* TO 'admin'@'localhost';")
+            cursor.execute(
+                "GRANT ALL ON theatre.* TO 'admin'@'localhost'  WITH GRANT OPTION;"
+            )
+            cursor.execute("GRANT EXECUTE ON *.* TO 'admin'@'localhost';")
+            cursor.execute(
+                "GRANT CREATE USER ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+            )
         if log:
             print("\t-Admin user created successfully.")
 
@@ -60,7 +64,6 @@ class UsersGenerator:
         # cursor.execute("GRANT 'viewer_role'@'localhost' TO 'viewer'@'localhost';")
         if log:
             cursor.execute("GRANT SELECT ON theatre.* TO 'viewer'@'localhost';")
-        if log:
             cursor.execute("GRANT EXECUTE ON theatre.* TO 'viewer'@'localhost';")
         if log:
             print("\t-Viewer user created successfully.")
@@ -73,7 +76,6 @@ class UsersGenerator:
         # )
         if log:
             cursor.execute("GRANT SELECT ON theatre.* TO 'event_manager'@'localhost';")
-        if log:
             cursor.execute("GRANT EXECUTE ON theatre.* TO 'event_manager'@'localhost';")
         if log:
             print("\t-Event manager user created successfully.")
@@ -86,7 +88,6 @@ class UsersGenerator:
         )
         if log:
             cursor.execute("GRANT SELECT ON theatre.* TO 'impresario'@'localhost';")
-        if log:
             cursor.execute("GRANT EXECUTE ON theatre.* TO 'impresario'@'localhost';")
         if log:
             print("\t-Impresario user created successfully.")
