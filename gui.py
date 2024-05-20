@@ -469,6 +469,44 @@ class GUI:
         # Размещение таблицы на окне
         table.pack()
 
+        # Фильтрация имресарио
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
+        buildings.append("Любое")
+        buildings = buildings[::-1]
+
+        building_label = tk.Label(self.current_window, text="Место работы:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            self.current_window, values=buildings, state="readonly"
+        )
+        building_combobox.current(0)
+        building_combobox.pack()
+
+        def filter_impresarios():
+            building_filter = building_combobox.get()
+            impresarios = self.db_manager.select_impresarios()
+
+            def filter_by_building(impresario):
+                if building_filter == "Любое" or impresario[1] == building_filter:
+                    return True
+                return False
+
+            impresarios = filter(filter_by_building, impresarios)
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            # Вставка отфильтрованных данных в таблицу
+            for row in impresarios:
+                table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(
+            self.current_window,
+            text="Поиск",
+            command=filter_impresarios,
+        )
+        accept_btn.pack()
+
         main_menu_button = tk.Button(
             self.current_window,
             text="Вернуться в главное меню",
