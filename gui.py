@@ -202,7 +202,7 @@ class GUI:
 
     def __actors_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Актеры")
+        self.current_window.title("Информация об актерах")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         actors = self.db_manager.select_actors()
@@ -248,7 +248,7 @@ class GUI:
 
     def __events_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("События")
+        self.current_window.title("Поиск подходящих событий")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         events = self.db_manager.select_events()
@@ -290,7 +290,7 @@ class GUI:
 
     def __impresarios_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Импресарио")
+        self.current_window.title("Информация об импресариоИнформация об импресарио")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         impresarios = self.db_manager.select_impresarios()
@@ -332,7 +332,7 @@ class GUI:
 
     def __buildings_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Здания")
+        self.current_window.title("Страница зданий")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         buildings = self.db_manager.select_buildings()
@@ -364,7 +364,7 @@ class GUI:
 
     def __contests_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Конкурсы")
+        self.current_window.title("Результаты конкурсов")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         events = self.db_manager.select_contests()
@@ -652,17 +652,17 @@ class GUI:
         # Общие для всех кнопки:
         actors_page_btn = tk.Button(
             self.current_window,
-            text="Страница актеров",
+            text="Информация об актерах",
             command=lambda: self.__set_next_window("actors_page"),
         )
         events_page_btn = tk.Button(
             self.current_window,
-            text="Страница событий",
+            text="Поиск подходящих событий",
             command=lambda: self.__set_next_window("events_page"),
         )
         impresarios_page_btn = tk.Button(
             self.current_window,
-            text="Страница импресарио",
+            text="Информация об импресарио",
             command=lambda: self.__set_next_window("impresarios_page"),
         )
         buildings_page_btn = tk.Button(
@@ -672,7 +672,7 @@ class GUI:
         )
         contests_page_btn = tk.Button(
             self.current_window,
-            text="Страница конкурсов",
+            text="Результаты конкурсов",
             command=lambda: self.__set_next_window("contests_page"),
         )
 
