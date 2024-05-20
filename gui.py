@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-# TODO: Добавить конкурсы.
-
 
 class GUI:
     def __init__(self):

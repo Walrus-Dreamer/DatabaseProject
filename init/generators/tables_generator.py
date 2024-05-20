@@ -4,7 +4,7 @@ log = True
 
 
 class TablesGenerator:
-    # TODO: move into TriggersGenerator
+    # TODO: Заставить съехать в собственное жилье. Что тут забыли триггеры?
     @staticmethod
     def __add_building_triggers(cursor):
         try:
@@ -205,7 +205,7 @@ class TablesGenerator:
                     f"\t-Variable 'log_bin_trust_function_creators' was not set to 1 due to: {error}."
                 )
 
-    # TODO: вынести генерацию каждой процедуры в отдельную функцию
+    # TODO: Выкинуть в класс с рождением функций.
     @staticmethod
     def __add_functions(cursor):
         TablesGenerator.__trust_function_creators(cursor)

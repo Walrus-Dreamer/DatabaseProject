@@ -50,7 +50,7 @@ class Kernel:
                         errors = False
                     except mysql.connector.Error as error:
                         print(f"Failed to sign in: {error}")
-                        # TODO: добавить окно с ошибкой.
+                        # TODO: добавить окно с ошибкой. РУГАТЬ ПОЛЬЗОВАТЕЛЯ!
             next_window_name = gui.handle_command(next_window_name, self.role)
 
         user_decision = input("Вы хотите очистить базу? (y/n): ")

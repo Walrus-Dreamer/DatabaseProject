@@ -17,7 +17,8 @@ log = True
 
 class DbInitializer:
     def __init__(self, username="root", password=None, host="localhost", port=3306):
-        # Костыль. TODO: не передавать сюда пустые строки, если хост и порт не были указаны.
+        # Это самый настоящий костыль, просот код захворал (как и я).
+        # TODO: не передавать сюда пустые строки, если хост и порт не были указаны.
         if host == "" or not host:
             host = "localhost"
         if port == "" or not port:
@@ -51,7 +52,7 @@ class DbInitializer:
         self.connector.autocommit = True
         self.cursor = self.connector.cursor()
 
-    # TODO: close connector and cursor in destructor
+    # TODO: УБИТЬ, НО НЕ ИСТЯЗАТЬ
     # def __del__(self):
     #     self.cursor.close()
     #     self.connector.close()

@@ -14,7 +14,7 @@ class DBManager:
         self.cursor = self.connector.cursor()
 
     def select_all_from(self, table_name):
-        # TODO: add make this function in db
+        # TODO: Закинуть в хранимку.
         self.cursor.execute(f"SELECT * FROM {table_name}")
         return self.cursor.fetchall()
 
