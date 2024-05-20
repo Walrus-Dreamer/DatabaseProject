@@ -193,12 +193,49 @@ class GUI:
         self.current_window.destroy()
 
     def __filter_actors(self):
-        self.current_window = tk.Tk()
-        self.current_window.title("Фильтрация актеров")
-        self.current_window.geometry("1280x720")
-        self.current_window.resizable(1, 1)
+        filter_actors_window = tk.Toplevel(self.current_window)
+        filter_actors_window.title("Фильтры")
+        self.selected_genre_filter = None
+        self.selected_building_filter = None
 
-        self.current_window.mainloop()
+        genres = [genre[0] for genre in self.db_manager.select_genres()]
+        genres.append("Любой")
+        genres = genres[::-1]
+
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
+        buildings.append("Любое")
+        buildings = buildings[::-1]
+
+        genre_label = tk.Label(filter_actors_window, text="Жанр:")
+        genre_label.pack()
+        genre_combobox = ttk.Combobox(
+            filter_actors_window, values=genres, state="readonly"
+        )
+        genre_combobox.current(0)
+        genre_combobox.pack()
+
+        building_label = tk.Label(filter_actors_window, text="Место работы:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            filter_actors_window, values=buildings, state="readonly"
+        )
+        building_combobox.current(0)
+        building_combobox.pack()
+
+        def accept():
+            self.selected_genre_filter = genre_combobox.get()
+            self.selected_building_filter = building_combobox.get()
+            filter_actors_window.destroy()
+
+        accept_btn = tk.Button(
+            filter_actors_window,
+            text="Применить",
+            command=accept,
+        )
+        accept_btn.pack()
+
+        filter_actors_window.mainloop()
+        return self.selected_genre_filter, self.selected_building_filter
 
     def __actors_page(self):
         self.current_window = tk.Tk()
@@ -211,7 +248,7 @@ class GUI:
         table = ttk.Treeview(
             self.current_window,
             columns=(
-                "Event name",
+                "Genre",
                 "Building name",
                 "Name",
                 "Surname",
@@ -220,8 +257,8 @@ class GUI:
             ),
         )
         table["show"] = "headings"
-        table.heading("Event name", text="Название события")
-        table.heading("Building name", text="Названия здания")
+        table.heading("Genre", text="Жанр")
+        table.heading("Building name", text="")
         table.heading("Name", text="Имя актера")
         table.heading("Surname", text="Фамилия актера")
         table.heading("Age", text="Возраст актера")
@@ -233,8 +270,63 @@ class GUI:
 
         # Размещение таблицы на окне
         table.pack()
-        # filter_button = tk.Button(self.current_window, text='Фильтр', command=self.__filter_actors)
-        # filter_button.pack()
+
+        # Фильтрация актеров
+        genres = [genre[0] for genre in self.db_manager.select_genres()]
+        genres.append("Любой")
+        genres = genres[::-1]
+
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
+        buildings.append("Любое")
+        buildings = buildings[::-1]
+
+        genre_label = tk.Label(self.current_window, text="Жанр:")
+        genre_label.pack()
+        genre_combobox = ttk.Combobox(
+            self.current_window, values=genres, state="readonly"
+        )
+        genre_combobox.current(0)
+        genre_combobox.pack()
+
+        building_label = tk.Label(self.current_window, text="Место работы:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            self.current_window, values=buildings, state="readonly"
+        )
+        building_combobox.current(0)
+        building_combobox.pack()
+
+        def filter_actors():
+            genre_filter = genre_combobox.get()
+            building_filter = building_combobox.get()
+            actors = self.db_manager.select_actors()
+
+            def filter_by_genre(actor):
+                if genre_filter == "Любой" or actor[1] == genre_filter:
+                    return True
+                return False
+
+            def filter_by_building(actor):
+                if building_filter == "Любое" or actor[2] == building_filter:
+                    return True
+                return False
+
+            actors = filter(filter_by_genre, actors)
+            actors = filter(filter_by_building, actors)
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            # Вставка отфильтрованных данных в таблицу
+            for row in actors:
+                table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(
+            self.current_window,
+            text="Поиск",
+            command=filter_actors,
+        )
+        accept_btn.pack()
 
         main_menu_button = tk.Button(
             self.current_window,

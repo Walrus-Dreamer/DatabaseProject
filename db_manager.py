@@ -22,7 +22,7 @@ class DBManager:
         self.cursor.execute(
             """
                             SELECT actor.id,
-                                    event.name as event_name,
+                                    event.genre_name,
                                     building.name as building_name,
                                     actor.name,
                                     actor.surname,

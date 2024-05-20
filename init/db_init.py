@@ -34,7 +34,7 @@ class DbInitializer:
         if log:
             print("\ndb_initer log:")
         try:
-            cursor.execute("CREATE DATABASE theatre")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS theatre")
             if log:
                 print("\t-Database created successfully.")
         except mysql.connector.Error:
