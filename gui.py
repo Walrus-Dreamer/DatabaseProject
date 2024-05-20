@@ -153,6 +153,34 @@ class GUI:
 
         return self.username, self.password, self.next_window_name
 
+    def __set_create_db(self, create_db):
+        self.create_db = create_db
+        self.current_window.destroy()
+
+    def create_db_modal(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Вы хотите создать базу данных?")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        yes_btn = tk.Button(
+            self.current_window,
+            text="Да",
+            command=lambda: self.__set_create_db(True),
+        )
+        yes_btn.pack()
+
+        no_btn = tk.Button(
+            self.current_window,
+            text="Нет",
+            command=lambda: self.__set_create_db(False),
+        )
+        no_btn.pack()
+
+        self.current_window.mainloop()
+
+        return self.create_db
+
     def get_role(self):
         return self.role
 

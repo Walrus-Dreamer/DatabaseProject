@@ -14,14 +14,14 @@ class Kernel:
         self.role = None
 
     def run(self):
+        gui = GUI()
+        create_db = gui.create_db_modal()
         # Инициализация БД
-        login_accepted = False
-        while not login_accepted:
+        while create_db:
             try:
-                gui = GUI()
                 root_login, root_password, host, port = gui.connect_to_db_screen()
                 db_initer = DbInitializer(root_login, root_password, host, port)
-                login_accepted = True
+                create_db = False
                 try:
                     TablesGenerator.create_tables(db_initer.connector)
                     TablesGenerator.create_triggers(db_initer.connector)
