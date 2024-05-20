@@ -34,6 +34,7 @@ class GUI:
         label_username.pack()
 
         entry_username = tk.Entry(login_window)
+        entry_username.insert(0, "root")
         entry_username.pack()
 
         label_password = tk.Label(login_window, text="Пароль:")
@@ -41,18 +42,21 @@ class GUI:
 
         entry_password = tk.Entry(login_window, show="*")
         entry_password.pack()
+        entry_password.insert(0, "root")
 
         label_host = tk.Label(login_window, text="Хост:")
         label_host.pack()
 
         entry_host = tk.Entry(login_window)
         entry_host.pack()
+        entry_host.insert(0, "localhost")
 
         label_port = tk.Label(login_window, text="Порт:")
         label_port.pack()
 
         entry_port = tk.Entry(login_window)
         entry_port.pack()
+        entry_port.insert(0, "3306")
 
         button_submit = tk.Button(
             login_window,

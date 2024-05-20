@@ -15,7 +15,6 @@ class Kernel:
 
     def run(self):
         # Инициализация БД
-        # TODO: Обернуть в цикл и повторять, пока не получим корректный пароль.
         login_accepted = False
         while not login_accepted:
             try:

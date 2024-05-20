@@ -22,6 +22,8 @@ class DbInitializer:
             host = "localhost"
         if port == "":
             port = 3306
+        else:
+            port = int(port)
         print(f"username: {username}, password: {password}, host: {host}, port: {port}")
         self.username = username
         self.password = password
