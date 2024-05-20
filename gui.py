@@ -332,6 +332,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -429,6 +431,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -471,6 +475,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -503,6 +509,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -552,6 +560,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -616,6 +626,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -690,6 +702,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
@@ -769,6 +783,8 @@ class GUI:
             self.current_window,
             text="Вернуться в главное меню",
             command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
         )
         main_menu_button.pack()
 
