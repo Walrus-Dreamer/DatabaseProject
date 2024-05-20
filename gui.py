@@ -385,7 +385,7 @@ class GUI:
         genre_combobox.current(0)
         genre_combobox.pack()
 
-        building_label = tk.Label(self.current_window, text="Место работы:")
+        building_label = tk.Label(self.current_window, text="Место проведения:")
         building_label.pack()
         building_combobox = ttk.Combobox(
             self.current_window, values=buildings, state="readonly"
@@ -638,7 +638,7 @@ class GUI:
         impresario_label = tk.Label(self.current_window, text="Выберите импресарио:")
         impresario_label.pack()
         impresario_combobox = ttk.Combobox(
-            self.current_window, values=list(impresarios.values())
+            self.current_window, values=list(impresarios.values()), state="readonly"
         )
         impresario_combobox.pack()
 
@@ -648,6 +648,9 @@ class GUI:
 
             # Получаем id импресарио по выбранному ФИО
             selected_full_name = impresario_combobox.get()
+            if not event_name or not genre_name or not selected_full_name:
+                self.error_modal("Заполните все поля!")
+                return
             selected_id = [
                 key for key, value in impresarios.items() if value == selected_full_name
             ][0]
@@ -787,16 +790,25 @@ class GUI:
         def submit():
             event_name = event_name_entry.get()
             first_place_full_name = first_place_combobox.get()
+            second_place_full_name = second_place_combobox.get()
+            third_place_full_name = third_place_combobox.get()
+
+            if (
+                not event_name
+                or not first_place_full_name
+                or not second_place_full_name
+                or not third_place_full_name
+            ):
+                self.error_modal("Заполните все поля!")
+                return
             first_place_id = [
                 key for key, value in actors.items() if value == first_place_full_name
             ][0]
 
-            second_place_full_name = second_place_combobox.get()
             second_place_id = [
                 key for key, value in actors.items() if value == second_place_full_name
             ][0]
 
-            third_place_full_name = third_place_combobox.get()
             third_place_id = [
                 key for key, value in actors.items() if value == third_place_full_name
             ][0]
@@ -848,38 +860,38 @@ class GUI:
         header_label = tk.Label(self.current_window, text=header_text)
         header_label.pack()
 
-        # Общие для всех кнопки:
-        actors_page_btn = tk.Button(
-            self.current_window,
-            text="Информация об актерах",
-            command=lambda: self.__set_next_window("actors_page"),
-        )
-        events_page_btn = tk.Button(
-            self.current_window,
-            text="Поиск подходящих событий",
-            command=lambda: self.__set_next_window("events_page"),
-        )
-        impresarios_page_btn = tk.Button(
-            self.current_window,
-            text="Информация об импресарио",
-            command=lambda: self.__set_next_window("impresarios_page"),
-        )
-        buildings_page_btn = tk.Button(
-            self.current_window,
-            text="Страница зданий",
-            command=lambda: self.__set_next_window("buildings_page"),
-        )
-        contests_page_btn = tk.Button(
-            self.current_window,
-            text="Результаты конкурсов",
-            command=lambda: self.__set_next_window("contests_page"),
-        )
-
-        actors_page_btn.pack()
-        events_page_btn.pack()
-        impresarios_page_btn.pack()
-        buildings_page_btn.pack()
-        contests_page_btn.pack()
+        # Общие для всех (кроме админа) кнопки:
+        if role != "admin_role":
+            actors_page_btn = tk.Button(
+                self.current_window,
+                text="Информация об актерах",
+                command=lambda: self.__set_next_window("actors_page"),
+            )
+            events_page_btn = tk.Button(
+                self.current_window,
+                text="Поиск подходящих событий",
+                command=lambda: self.__set_next_window("events_page"),
+            )
+            impresarios_page_btn = tk.Button(
+                self.current_window,
+                text="Информация об импресарио",
+                command=lambda: self.__set_next_window("impresarios_page"),
+            )
+            buildings_page_btn = tk.Button(
+                self.current_window,
+                text="Страница зданий",
+                command=lambda: self.__set_next_window("buildings_page"),
+            )
+            contests_page_btn = tk.Button(
+                self.current_window,
+                text="Результаты конкурсов",
+                command=lambda: self.__set_next_window("contests_page"),
+            )
+            actors_page_btn.pack()
+            events_page_btn.pack()
+            impresarios_page_btn.pack()
+            buildings_page_btn.pack()
+            contests_page_btn.pack()
 
         match role:
             case "admin_role":
