@@ -16,16 +16,22 @@ class GUI:
         self.current_window.destroy()
 
     def __submit(
-        self, login_window, entry_username, entry_password, entry_host, entry_port
+        self,
+        login_window,
+        entry_username,
+        entry_password,
+        entry_host=None,
+        entry_port=None,
     ):
         self.username = entry_username.get()
         self.password = entry_password.get()
-        self.host = entry_host.get()
-        self.port = entry_port.get()
+        if entry_host and entry_port:
+            self.host = entry_host.get()
+            self.port = entry_port.get()
         login_window.destroy()
         self.current_window.destroy()
 
-    def __open_login_window(self):
+    def __open_login_window(self, login_as_user=False):
         login_window = tk.Toplevel(self.current_window)
 
         login_window.title("Вход")
@@ -34,7 +40,8 @@ class GUI:
         label_username.pack()
 
         entry_username = tk.Entry(login_window)
-        entry_username.insert(0, "root")
+        if not login_as_user:
+            entry_username.insert(0, "root")
         entry_username.pack()
 
         label_password = tk.Label(login_window, text="Пароль:")
@@ -42,42 +49,47 @@ class GUI:
 
         entry_password = tk.Entry(login_window, show="*")
         entry_password.pack()
-        entry_password.insert(0, "root")
+        if not login_as_user:
+            entry_password.insert(0, "root")
 
-        label_host = tk.Label(login_window, text="Хост:")
-        label_host.pack()
+        if not login_as_user:
+            label_host = tk.Label(login_window, text="Хост:")
+            label_host.pack()
 
-        entry_host = tk.Entry(login_window)
-        entry_host.pack()
-        entry_host.insert(0, "localhost")
+            entry_host = tk.Entry(login_window)
+            entry_host.pack()
+            entry_host.insert(0, "localhost")
 
-        label_port = tk.Label(login_window, text="Порт:")
-        label_port.pack()
+            label_port = tk.Label(login_window, text="Порт:")
+            label_port.pack()
 
-        entry_port = tk.Entry(login_window)
-        entry_port.pack()
-        entry_port.insert(0, "3306")
+            entry_port = tk.Entry(login_window)
+            entry_port.pack()
+            entry_port.insert(0, "3306")
 
-        button_submit = tk.Button(
-            login_window,
-            text="Войти",
-            command=lambda: self.__submit(
-                login_window=login_window,
-                entry_username=entry_username,
-                entry_password=entry_password,
-                entry_host=entry_host,
-                entry_port=entry_port,
-            ),
-        )
-
-        button_submit.pack()
-
-    """
-    Connects to the database screen, where a
-    user can enter the connection details.
-    This function does not take any parameters.
-    It does not return anything.
-    """
+            button_submit = tk.Button(
+                login_window,
+                text="Войти",
+                command=lambda: self.__submit(
+                    login_window=login_window,
+                    entry_username=entry_username,
+                    entry_password=entry_password,
+                    entry_host=entry_host,
+                    entry_port=entry_port,
+                ),
+            )
+            button_submit.pack()
+        else:
+            button_submit = tk.Button(
+                login_window,
+                text="Войти",
+                command=lambda: self.__submit(
+                    login_window=login_window,
+                    entry_username=entry_username,
+                    entry_password=entry_password,
+                ),
+            )
+            button_submit.pack()
 
     def connect_to_db_screen(self):
         self.current_window = tk.Tk()
@@ -126,7 +138,7 @@ class GUI:
         sign_in_btn = tk.Button(
             self.current_window,
             text="Войти",
-            command=self.__open_login_window,
+            command=lambda: self.__open_login_window(login_as_user=True),
         )
         sign_in_btn.pack()
 
