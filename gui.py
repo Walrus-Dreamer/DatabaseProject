@@ -569,21 +569,21 @@ class GUI:
         first_place_label = tk.Label(self.current_window, text="Первое место:")
         first_place_label.pack()
         first_place_combobox = ttk.Combobox(
-            self.current_window, values=list(actors.values())
+            self.current_window, values=list(actors.values()), state="readonly"
         )
         first_place_combobox.pack()
 
         second_place_label = tk.Label(self.current_window, text="Второе место:")
         second_place_label.pack()
         second_place_combobox = ttk.Combobox(
-            self.current_window, values=list(actors.values())
+            self.current_window, values=list(actors.values()), state="readonly"
         )
         second_place_combobox.pack()
 
         third_place_label = tk.Label(self.current_window, text="Третье место:")
         third_place_label.pack()
         third_place_combobox = ttk.Combobox(
-            self.current_window, values=list(actors.values())
+            self.current_window, values=list(actors.values()), state="readonly"
         )
         third_place_combobox.pack()
 
