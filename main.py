@@ -50,7 +50,6 @@ class Kernel:
                         errors = False
                     except mysql.connector.Error as error:
                         print(f"Failed to sign in: {error}")
-                        pass
                         # TODO: добавить окно с ошибкой.
             next_window_name = gui.handle_command(next_window_name, self.role)
 

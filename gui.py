@@ -192,90 +192,6 @@ class GUI:
         self.next_window_name = next_window_name
         self.current_window.destroy()
 
-    def __main_menu(self, role):
-        # self.db_manager.create_user("another_user", "1", "event_manager_role")
-        self.current_window = tk.Tk()
-        self.current_window.title("Главное меню")
-        self.current_window.geometry("1280x720")
-        self.current_window.resizable(1, 1)
-        self.next_window_name = "exit"
-
-        header_text = None
-        match role:
-            case "admin_role":
-                header_text = "Меню для администратора БД"
-            case "viewer_role":
-                header_text = "Меню для зрителя"
-            case "event_manager_role":
-                header_text = "Меню для менеджера событий"
-            case "impresario_role":
-                header_text = "Меню для импресарио"
-
-        header_label = tk.Label(self.current_window, text=header_text)
-        header_label.pack()
-
-        # Общие для всех кнопки:
-        actors_page_btn = tk.Button(
-            self.current_window,
-            text="Страница актеров",
-            command=lambda: self.__set_next_window("actors_page"),
-        )
-        events_page_btn = tk.Button(
-            self.current_window,
-            text="Страница событий",
-            command=lambda: self.__set_next_window("events_page"),
-        )
-        impresarios_page_btn = tk.Button(
-            self.current_window,
-            text="Страница импресарио",
-            command=lambda: self.__set_next_window("impresarios_page"),
-        )
-        buildings_page_btn = tk.Button(
-            self.current_window,
-            text="Страница зданий",
-            command=lambda: self.__set_next_window("buildings_page"),
-        )
-        contests_page_btn = tk.Button(
-            self.current_window,
-            text="Страница конкурсов",
-            command=lambda: self.__set_next_window("contests_page"),
-        )
-
-        actors_page_btn.pack()
-        events_page_btn.pack()
-        impresarios_page_btn.pack()
-        buildings_page_btn.pack()
-        contests_page_btn.pack()
-
-        match role:
-            case "admin_role":
-                create_user_btn = tk.Button(
-                    self.current_window,
-                    text="Создание пользователя",
-                    command=lambda: self.__set_next_window("create_user"),
-                )
-                create_user_btn.pack()
-            case "viewer_role":
-                pass
-            case "event_manager_role":
-                create_event_btn = tk.Button(
-                    self.current_window,
-                    text="Создать событие",
-                    command=lambda: self.__set_next_window("create_event"),
-                )
-                create_event_btn.pack()
-            case "impresario_role":
-                pass
-        exit_btn = tk.Button(
-            self.current_window,
-            text="Выйти из аккаунта",
-            command=lambda: self.__set_next_window("change_user"),
-        )
-        exit_btn.pack()
-
-        self.current_window.mainloop()
-        return self.next_window_name
-
     def __filter_actors(self):
         self.current_window = tk.Tk()
         self.current_window.title("Фильтрация актеров")
@@ -543,7 +459,7 @@ class GUI:
                 key for key, value in impresarios.items() if value == selected_full_name
             ][0]
 
-            self.db_manager.insert_event(event_name, genre_name, selected_id)
+            self.db_manager.create_event(event_name, genre_name, selected_id)
             self.current_window.destroy()
 
         submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
@@ -633,6 +549,179 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __create_contest_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление конкурса")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        # Получаем названия жанров
+        actors = {
+            actor[0]: actor[3] + " " + actor[4]
+            for actor in self.db_manager.select_actors()
+        }
+
+        event_name_label = tk.Label(self.current_window, text="Название конкурса:")
+        event_name_label.pack()
+        event_name_entry = tk.Entry(self.current_window)
+        event_name_entry.pack()
+
+        first_place_label = tk.Label(self.current_window, text="Первое место:")
+        first_place_label.pack()
+        first_place_combobox = ttk.Combobox(
+            self.current_window, values=list(actors.values())
+        )
+        first_place_combobox.pack()
+
+        second_place_label = tk.Label(self.current_window, text="Второе место:")
+        second_place_label.pack()
+        second_place_combobox = ttk.Combobox(
+            self.current_window, values=list(actors.values())
+        )
+        second_place_combobox.pack()
+
+        third_place_label = tk.Label(self.current_window, text="Третье место:")
+        third_place_label.pack()
+        third_place_combobox = ttk.Combobox(
+            self.current_window, values=list(actors.values())
+        )
+        third_place_combobox.pack()
+
+        def submit():
+            event_name = event_name_entry.get()
+            first_place_full_name = first_place_combobox.get()
+            first_place_id = [
+                key for key, value in actors.items() if value == first_place_full_name
+            ][0]
+
+            second_place_full_name = second_place_combobox.get()
+            second_place_id = [
+                key for key, value in actors.items() if value == second_place_full_name
+            ][0]
+
+            third_place_full_name = third_place_combobox.get()
+            third_place_id = [
+                key for key, value in actors.items() if value == third_place_full_name
+            ][0]
+
+            if len(set([first_place_id, second_place_id, third_place_id])) != 3:
+                self.error_modal(
+                    "Один участник не может занимать несколько мест одновременно!"
+                )
+                return
+
+            self.db_manager.create_contest(
+                event_name, first_place_id, second_place_id, third_place_id
+            )
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
+    def __main_menu(self, role):
+        self.current_window = tk.Tk()
+        self.current_window.title("Главное меню")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+        self.next_window_name = "exit"
+
+        header_text = None
+        match role:
+            case "admin_role":
+                header_text = "Меню для администратора БД"
+            case "viewer_role":
+                header_text = "Меню для зрителя"
+            case "event_manager_role":
+                header_text = "Меню для менеджера событий"
+            case "impresario_role":
+                header_text = "Меню для импресарио"
+
+        header_label = tk.Label(self.current_window, text=header_text)
+        header_label.pack()
+
+        # Общие для всех кнопки:
+        actors_page_btn = tk.Button(
+            self.current_window,
+            text="Страница актеров",
+            command=lambda: self.__set_next_window("actors_page"),
+        )
+        events_page_btn = tk.Button(
+            self.current_window,
+            text="Страница событий",
+            command=lambda: self.__set_next_window("events_page"),
+        )
+        impresarios_page_btn = tk.Button(
+            self.current_window,
+            text="Страница импресарио",
+            command=lambda: self.__set_next_window("impresarios_page"),
+        )
+        buildings_page_btn = tk.Button(
+            self.current_window,
+            text="Страница зданий",
+            command=lambda: self.__set_next_window("buildings_page"),
+        )
+        contests_page_btn = tk.Button(
+            self.current_window,
+            text="Страница конкурсов",
+            command=lambda: self.__set_next_window("contests_page"),
+        )
+
+        actors_page_btn.pack()
+        events_page_btn.pack()
+        impresarios_page_btn.pack()
+        buildings_page_btn.pack()
+        contests_page_btn.pack()
+
+        match role:
+            case "admin_role":
+                create_user_btn = tk.Button(
+                    self.current_window,
+                    text="Создание пользователя",
+                    command=lambda: self.__set_next_window("create_user"),
+                )
+                create_user_btn.pack()
+            case "viewer_role":
+                pass
+            case "event_manager_role":
+                create_event_btn = tk.Button(
+                    self.current_window,
+                    text="Создать событие",
+                    command=lambda: self.__set_next_window("create_event"),
+                )
+                create_event_btn.pack()
+            case "impresario_role":
+                create_event_btn = tk.Button(
+                    self.current_window,
+                    text="Создать событие",
+                    command=lambda: self.__set_next_window("create_event"),
+                )
+                create_contest_btn = tk.Button(
+                    self.current_window,
+                    text="Создать конкурс",
+                    command=lambda: self.__set_next_window("create_contest"),
+                )
+                create_event_btn.pack()
+                create_contest_btn.pack()
+        exit_btn = tk.Button(
+            self.current_window,
+            text="Выйти из аккаунта",
+            command=lambda: self.__set_next_window("change_user"),
+        )
+        exit_btn.pack()
+
+        self.current_window.mainloop()
+        return self.next_window_name
+
     def handle_command(self, command, role):
         next_window = "exit"
         match command:
@@ -650,6 +739,8 @@ class GUI:
                 next_window = self.__create_event_page()
             case "create_user":
                 next_window = self.__create_user_page()
+            case "create_contest":
+                next_window = self.__create_contest_page()
             case "contests_page":
                 next_window = self.__contests_page()
         return next_window

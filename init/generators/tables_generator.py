@@ -324,6 +324,17 @@ class TablesGenerator:
             if log:
                 print("\t-Procedure 'add_event' created successfully.")
 
+            cursor.execute(
+                """
+                           CREATE PROCEDURE add_contest(IN name VARCHAR(255), IN first_place_id INT, IN second_place_id INT, IN third_place_id INT)
+                                BEGIN
+                                    INSERT INTO contest (name, first_place_id, second_place_id, third_place_id) VALUES (name, first_place_id, second_place_id, third_place_id);
+                                END
+                           """
+            )
+            if log:
+                print("\t-Procedure 'add_contest' created successfully.")
+
         except mysql.connector.Error as error:
             if log:
                 print(f"\t-Failed to create procedures: {error}.")

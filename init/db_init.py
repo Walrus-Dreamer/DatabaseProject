@@ -24,7 +24,6 @@ class DbInitializer:
             port = 3306
         else:
             port = int(port)
-        print(f"username: {username}, password: {password}, host: {host}, port: {port}")
         self.username = username
         self.password = password
         connector = mysql.connector.connect(
