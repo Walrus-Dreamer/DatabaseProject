@@ -346,6 +346,7 @@ class TablesGenerator:
                             CREATE TABLE IF NOT EXISTS building (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 name VARCHAR(255),
+                                type VARCHAR(255),
                                 creation_date TIMESTAMP
                             )"""
         )
@@ -391,10 +392,12 @@ class TablesGenerator:
                                 name VARCHAR(255),
                                 genre_name VARCHAR(255),
                                 impresario_id INT,
+                                building_id INT,
                                 creation_date TIMESTAMP,
 
                                 FOREIGN KEY (genre_name) REFERENCES genre(name),
-                                FOREIGN KEY (impresario_id) REFERENCES impresario(id)
+                                FOREIGN KEY (impresario_id) REFERENCES impresario(id),
+                                FOREIGN KEY (building_id) REFERENCES building(id)
                             )"""
         )
         if log:
