@@ -441,6 +441,22 @@ class TablesGenerator:
             print("\t-Table 'actor_genre_link' created successfully.")
 
     @staticmethod
+    def __create_actor_event_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS actor_event_link (
+                                actor_id INT,
+                                event_id INT,
+                                creation_date TIMESTAMP,
+
+                                FOREIGN KEY (actor_id) REFERENCES actor(id) ON DELETE CASCADE,
+                                FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
+                            )"""
+        )
+        if log:
+            print("\t-Table 'actor_genre_link' created successfully.")
+
+    @staticmethod
     def __create_impresario_genre_link_table(cursor):
         cursor.execute(
             """
@@ -501,6 +517,7 @@ class TablesGenerator:
             TablesGenerator.__create_event_table(cursor)
             TablesGenerator.__create_actor_table(cursor)
             TablesGenerator.__create_actor_genre_link_table(cursor)
+            TablesGenerator.__create_actor_event_link_table(cursor)
             TablesGenerator.__create_impresario_genre_link_table(cursor)
             TablesGenerator.__create_contest_table(cursor)
             TablesGenerator.__create_username_role_table(cursor)
