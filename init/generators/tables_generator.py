@@ -194,6 +194,30 @@ class TablesGenerator:
                 )
 
     @staticmethod
+    def __add_contest_triggers(cursor):
+        try:
+            cursor.execute(
+                """
+                        CREATE TRIGGER check_places_unique
+                            BEFORE INSERT ON contest
+                            FOR EACH ROW
+                            BEGIN
+                                IF NEW.first_place_id = NEW.second_place_id OR NEW.first_place_id = NEW.third_place_id OR NEW.second_place_id = NEW.third_place_id THEN
+                                    SIGNAL SQLSTATE '45000'
+                                    SET MESSAGE_TEXT = 'Error: The first, second, and third place IDs must be unique';
+                                END IF;
+                            END;
+                        """
+            )
+            if log:
+                print("\t-Trigger 'check_places_unique' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(
+                    f"\t-Trigger 'check_places_unique' was not created due to: {error}."
+                )
+
+    @staticmethod
     def __trust_function_creators(cursor):
         try:
             cursor.execute("SET GLOBAL log_bin_trust_function_creators = 1;")
@@ -538,6 +562,7 @@ class TablesGenerator:
             TablesGenerator.__add_actor_triggers(cursor)
             TablesGenerator.__add_actor_genre_link_triggers(cursor)
             TablesGenerator.__add_impresario_genre_link_triggers(cursor)
+            TablesGenerator.__add_contest_triggers(cursor)
             TablesGenerator.__add_contest_triggers(cursor)
         except mysql.connector.Error as error:
             if log:
