@@ -393,6 +393,8 @@ class TablesGenerator:
                                 genre_name VARCHAR(255),
                                 impresario_id INT,
                                 building_id INT,
+                                event_date VARCHAR(255),
+                                box_office INT,
                                 creation_date TIMESTAMP,
 
                                 FOREIGN KEY (genre_name) REFERENCES genre(name),
