@@ -469,7 +469,7 @@ class GUI:
         # Размещение таблицы на окне
         table.pack()
 
-        # Фильтрация имресарио
+        # Фильтрация импресарио
         buildings = [building[1] for building in self.db_manager.select_buildings()]
         buildings.append("Любое")
         buildings = buildings[::-1]
