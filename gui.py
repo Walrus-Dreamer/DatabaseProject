@@ -237,7 +237,7 @@ class GUI:
 
     def __actors_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Информация об актерах")
+        self.current_window.title("Информация об артистах")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         actors = self.db_manager.select_actors()
@@ -257,9 +257,9 @@ class GUI:
         table["show"] = "headings"
         table.heading("Genre", text="Жанр")
         table.heading("Building name", text="")
-        table.heading("Name", text="Имя актера")
-        table.heading("Surname", text="Фамилия актера")
-        table.heading("Age", text="Возраст актера")
+        table.heading("Name", text="Имя артиста")
+        table.heading("Surname", text="Фамилия артиста")
+        table.heading("Age", text="Возраст артиста")
         table.heading("Creation Date", text="Дата создания записи")
 
         # Вставка данных в таблицу
@@ -269,7 +269,7 @@ class GUI:
         # Размещение таблицы на окне
         table.pack()
 
-        # Фильтрация актеров
+        # Фильтрация артистов
         genres = [genre[0] for genre in self.db_manager.select_genres()]
         genres.append("Любой")
         genres = genres[::-1]
@@ -864,7 +864,7 @@ class GUI:
         if role != "admin_role":
             actors_page_btn = tk.Button(
                 self.current_window,
-                text="Информация об актерах",
+                text="Информация об артистах",
                 command=lambda: self.__set_next_window("actors_page"),
             )
             events_page_btn = tk.Button(
