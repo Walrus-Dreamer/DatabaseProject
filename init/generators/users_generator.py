@@ -82,6 +82,12 @@ class UsersGenerator:
                 "GRANT SELECT ON infosystem.* TO 'event_manager'@'localhost';"
             )
             cursor.execute(
+                "GRANT INSERT ON infosystem.event TO 'event_manager'@'localhost';"
+            )
+            cursor.execute(
+                "GRANT INSERT ON infosystem.actor_event_link TO 'event_manager'@'localhost';"
+            )
+            cursor.execute(
                 "GRANT EXECUTE ON infosystem.* TO 'event_manager'@'localhost';"
             )
         if log:

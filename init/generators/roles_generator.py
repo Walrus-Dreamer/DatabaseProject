@@ -72,6 +72,9 @@ class RolesGenerator:
             "GRANT INSERT ON infosystem.event TO 'event_manager_role'@'localhost';"
         )
         cursor.execute(
+            "GRANT INSERT ON infosystem.actor_event_link TO 'event_manager_role'@'localhost';"
+        )
+        cursor.execute(
             "GRANT UPDATE ON infosystem.event TO 'event_manager_role'@'localhost';"
         )
         if log:

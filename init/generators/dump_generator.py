@@ -276,6 +276,41 @@ class DumpGenerator:
             print("\t-Event_rating_links dump created successfully.")
 
     @staticmethod
+    def __insert_actor_event_links(cursor):
+        cursor.execute(
+            """
+                        INSERT INTO actor_event_link (actor_id, event_id) VALUES
+                            (1, 1),
+                            (1, 2),
+                            (1, 3),
+                            (2, 1),
+                            (2, 4),
+                            (2, 6),
+                            (2, 7),
+                            (3, 1),
+                            (3, 2),
+                            (3, 3),
+                            (4, 1),
+                            (4, 4),
+                            (4, 5),
+                            (5, 5),
+                            (5, 6),
+                            (5, 7),
+                            (6, 3),
+                            (7, 8),
+                            (7, 9),
+                            (7, 10),
+                            (8, 2),
+                            (9, 3),
+                            (10, 4),
+                            (11, 5),
+                            (12, 1);
+                        """
+        )
+        if log:
+            print("\t-Event_rating_links dump created successfully.")
+
+    @staticmethod
     def create_dump(connector):
         cursor = connector.cursor()
         if log:
@@ -292,6 +327,7 @@ class DumpGenerator:
             DumpGenerator.__insert_username_roles(cursor)
             DumpGenerator.__insert_event_ratings(cursor)
             DumpGenerator.__insert_favorite_actor_links(cursor)
+            DumpGenerator.__insert_actor_event_links(cursor)
             if log:
                 print("\t-Dump created successfully.")
         except mysql.connector.Error as error:

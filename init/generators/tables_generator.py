@@ -370,6 +370,17 @@ class TablesGenerator:
             if log:
                 print("\t-Procedure 'add_event_rating' created successfully.")
 
+            cursor.execute(
+                """
+                           CREATE PROCEDURE add_actor_event_link(IN actor_id INT, IN event_id INT)
+                                BEGIN
+                                    INSERT INTO actor_event_link (actor_id, event_id) VALUES (actor_id, event_id);
+                                END
+                           """
+            )
+            if log:
+                print("\t-Procedure 'add_event_rating' created successfully.")
+
         except mysql.connector.Error as error:
             if log:
                 print(f"\t-Failed to create procedures: {error}.")
@@ -569,6 +580,20 @@ class TablesGenerator:
             print("\t-Table 'favorite_actor_link' created successfully.")
 
     @staticmethod
+    def __create_actor_event_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS actor_event_link (
+                                actor_id INT,
+                                event_id INT,
+                                FOREIGN KEY (actor_id) REFERENCES actor(id),
+                                FOREIGN KEY (event_id) REFERENCES event(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'actor_event_link' created successfully.")
+
+    @staticmethod
     def create_tables(connector):
         cursor = connector.cursor()
         if log:
@@ -586,6 +611,7 @@ class TablesGenerator:
             TablesGenerator.__create_username_role_table(cursor)
             TablesGenerator.__create_event_rating_table(cursor)
             TablesGenerator.__create_favorite_actor_link_table(cursor)
+            TablesGenerator.__create_actor_event_link_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))

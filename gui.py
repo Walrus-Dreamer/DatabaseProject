@@ -909,6 +909,52 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __create_actor_event_link_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление артиста в событие")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        actors = [
+            actor[3] + " " + actor[4] for actor in self.db_manager.select_actors()
+        ]
+        events = [event[2] for event in self.db_manager.select_events()]
+
+        actor_label = tk.Label(self.current_window, text="Артист:")
+        actor_label.pack()
+        actor_combobox = ttk.Combobox(
+            self.current_window, values=actors, state="readonly"
+        )
+        actor_combobox.pack()
+
+        event_label = tk.Label(self.current_window, text="Событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        def submit():
+            actor_id = actor_combobox.current() + 1
+            event_id = event_combobox.current() + 1
+            self.db_manager.add_actor_event_link(actor_id, event_id)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __rate_event_page(self):
         self.current_window = tk.Tk()
         self.current_window.title("Оценка культурного события")
@@ -1113,6 +1159,12 @@ class GUI:
                     command=lambda: self.__set_next_window("create_event"),
                 )
                 create_event_btn.pack()
+                create_actor_event_link_btn = tk.Button(
+                    self.current_window,
+                    text="Добавить артиста в событие",
+                    command=lambda: self.__set_next_window("create_actor_event_link"),
+                )
+                create_actor_event_link_btn.pack()
 
                 create_building_btn = tk.Button(
                     self.current_window,
@@ -1164,6 +1216,8 @@ class GUI:
                 next_window = self.__create_contest_page()
             case "create_building":
                 next_window = self.__create_building_page()
+            case "create_actor_event_link":
+                next_window = self.__create_actor_event_link_page()
             case "contests_page":
                 next_window = self.__contests_page()
             case "rate_event":

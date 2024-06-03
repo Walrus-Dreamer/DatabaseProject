@@ -189,6 +189,11 @@ class DBManager:
             f"INSERT INTO favorite_actor_link VALUES ('{actor_id}', '{username}');"
         )
 
+    def add_actor_event_link(self, actor_id, event_id):
+        self.cursor.execute(
+            f"INSERT INTO actor_event_link VALUES ({actor_id}, {event_id});"
+        )
+
     def create_user(self, username, password, role):
         self.cursor.execute(
             f"INSERT INTO username_role VALUES ('{username}@localhost', '{role}');"
