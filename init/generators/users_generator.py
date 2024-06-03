@@ -65,6 +65,9 @@ class UsersGenerator:
         if log:
             cursor.execute("GRANT SELECT ON infosystem.* TO 'viewer'@'localhost';")
             cursor.execute("GRANT EXECUTE ON infosystem.* TO 'viewer'@'localhost';")
+            cursor.execute(
+                "GRANT INSERT ON infosystem.favorite_actor_link TO 'viewer'@'localhost';"
+            )
         if log:
             print("\t-Viewer user created successfully.")
 
@@ -77,6 +80,12 @@ class UsersGenerator:
         if log:
             cursor.execute(
                 "GRANT SELECT ON infosystem.* TO 'event_manager'@'localhost';"
+            )
+            cursor.execute(
+                "GRANT INSERT ON infosystem.event TO 'event_manager'@'localhost';"
+            )
+            cursor.execute(
+                "GRANT INSERT ON infosystem.actor_event_link TO 'event_manager'@'localhost';"
             )
             cursor.execute(
                 "GRANT EXECUTE ON infosystem.* TO 'event_manager'@'localhost';"

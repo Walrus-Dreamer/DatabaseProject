@@ -56,6 +56,9 @@ class RolesGenerator:
         cursor.execute("CREATE ROLE 'viewer_role'@'localhost';")
         cursor.execute("GRANT SELECT ON infosystem.* TO 'viewer_role'@'localhost';")
         cursor.execute("GRANT EXECUTE ON infosystem.* TO 'viewer_role'@'localhost';")
+        cursor.execute(
+            "GRANT INSERT ON infosystem.favorite_actor_link TO 'viewer_role'@'localhost';"
+        )
         if log:
             print("\t-Viewer role created successfully.")
 
@@ -67,6 +70,9 @@ class RolesGenerator:
         )
         cursor.execute(
             "GRANT INSERT ON infosystem.event TO 'event_manager_role'@'localhost';"
+        )
+        cursor.execute(
+            "GRANT INSERT ON infosystem.actor_event_link TO 'event_manager_role'@'localhost';"
         )
         cursor.execute(
             "GRANT UPDATE ON infosystem.event TO 'event_manager_role'@'localhost';"

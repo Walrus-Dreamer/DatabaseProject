@@ -237,7 +237,7 @@ class GUI:
 
     def __actors_page(self):
         self.current_window = tk.Tk()
-        self.current_window.title("Информация об актерах")
+        self.current_window.title("Информация об артистах")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
         actors = self.db_manager.select_actors()
@@ -257,9 +257,9 @@ class GUI:
         table["show"] = "headings"
         table.heading("Genre", text="Жанр")
         table.heading("Building name", text="")
-        table.heading("Name", text="Имя актера")
-        table.heading("Surname", text="Фамилия актера")
-        table.heading("Age", text="Возраст актера")
+        table.heading("Name", text="Имя артиста")
+        table.heading("Surname", text="Фамилия артиста")
+        table.heading("Age", text="Возраст артиста")
         table.heading("Creation Date", text="Дата создания записи")
 
         # Вставка данных в таблицу
@@ -269,7 +269,7 @@ class GUI:
         # Размещение таблицы на окне
         table.pack()
 
-        # Фильтрация актеров
+        # Фильтрация артистов
         genres = [genre[0] for genre in self.db_manager.select_genres()]
         genres.append("Любой")
         genres = genres[::-1]
@@ -343,7 +343,6 @@ class GUI:
         self.current_window.title("Поиск подходящих событий")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
-        events = self.db_manager.select_events()
 
         # Создание таблицы для отображения данных
         table = ttk.Treeview(
@@ -437,6 +436,84 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __event_stats_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Статистика по событиям")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        # Создание таблицы для отображения данных
+        table = ttk.Treeview(
+            self.current_window,
+            columns=(
+                "Event name",
+                "Genre name",
+                "Impresario full name",
+                "Building name",
+                "Box office",
+                "Average rating",
+                "Actor likes",
+            ),
+        )
+        table["show"] = "headings"
+        table.heading("Event name", text="Название")
+        table.heading("Genre name", text="Жанр")
+        table.heading("Impresario full name", text="ФИО импресарио")
+        table.heading("Building name", text="Место проведения")
+        table.heading("Box office", text="Сборы")
+        table.heading("Average rating", text="Средняя оценка")
+        table.heading("Actor likes", text="Лайки актеров")
+
+        # Размещение таблицы на окне
+        table.pack()
+
+        events = [event[2] for event in self.db_manager.select_events()]
+        event_label = tk.Label(self.current_window, text="Выбрать событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        def show_stats():
+            selected_event_id = event_combobox.current() + 1
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            event_stats = self.db_manager.select_event_stats(selected_event_id)
+            # Вставка отфильтрованных данных в таблицу
+            prepared_data = (
+                        event_stats[0][0],
+                        event_stats[0][1],
+                        event_stats[0][2],
+                        event_stats[0][3] + " " + event_stats[0][4],
+                        event_stats[0][5],
+                        event_stats[0][6],
+                        event_stats[0][7],
+                        event_stats[0][8],
+                    )
+            table.insert("", "end", values=prepared_data[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(
+            self.current_window,
+            text="Показать статистику",
+            command=show_stats,
+        )
+        accept_btn.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __impresarios_page(self):
         self.current_window = tk.Tk()
         self.current_window.title("Информация об импресариоИнформация об импресарио")
@@ -469,7 +546,7 @@ class GUI:
         # Размещение таблицы на окне
         table.pack()
 
-        # Фильтрация имресарио
+        # Фильтрация импресарио
         buildings = [building[1] for building in self.db_manager.select_buildings()]
         buildings.append("Любое")
         buildings = buildings[::-1]
@@ -622,6 +699,7 @@ class GUI:
             impresario[0]: impresario[2] + " " + impresario[3]
             for impresario in self.db_manager.select_impresarios()
         }
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
 
         event_name_label = tk.Label(self.current_window, text="Название события:")
         event_name_label.pack()
@@ -642,20 +720,48 @@ class GUI:
         )
         impresario_combobox.pack()
 
+        building_label = tk.Label(self.current_window, text="Выберите здание:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            self.current_window, values=buildings, state="readonly"
+        )
+        building_combobox.pack()
+
+        event_date_label = tk.Label(self.current_window, text="Дата события:")
+        event_date_label.pack()
+        event_date_entry = tk.Entry(self.current_window)
+        event_date_entry.pack()
+
+        box_office_label = tk.Label(self.current_window, text="Сборы:")
+        box_office_label.pack()
+        box_office_entry = tk.Entry(self.current_window)
+        box_office_entry.pack()
+
         def submit():
             event_name = event_name_entry.get()
             genre_name = genre_combobox.get()
+            building_id = building_combobox.current() + 1
+            event_date = event_date_entry.get()
+            # TODO: добавить ошибку, если не получается преобразовать в int.
+            box_office = int(box_office_entry.get())
 
             # Получаем id импресарио по выбранному ФИО
             selected_full_name = impresario_combobox.get()
             if not event_name or not genre_name or not selected_full_name:
                 self.error_modal("Заполните все поля!")
                 return
-            selected_id = [
+            impresario_id = [
                 key for key, value in impresarios.items() if value == selected_full_name
             ][0]
 
-            self.db_manager.create_event(event_name, genre_name, selected_id)
+            self.db_manager.create_event(
+                event_name,
+                genre_name,
+                impresario_id,
+                building_id,
+                event_date,
+                box_office,
+            )
             self.current_window.destroy()
 
         submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
@@ -839,6 +945,216 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __create_building_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление культурного сооружения")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        building_types = ["Театр", "Кинотеатр", "Дворец культуры"]
+
+        building_name_label = tk.Label(self.current_window, text="Название здания:")
+        building_name_label.pack()
+        building_name_entry = tk.Entry(self.current_window)
+        building_name_entry.pack()
+
+        building_type_label = tk.Label(self.current_window, text="Тип здания:")
+        building_type_label.pack()
+        building_type_combobox = ttk.Combobox(
+            self.current_window, values=building_types, state="readonly"
+        )
+        building_type_combobox.pack()
+
+        def submit():
+            building_name = building_name_entry.get()
+            building_type = building_type_combobox.get()
+
+            self.db_manager.create_building(building_name, building_type)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
+    def __create_actor_event_link_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление артиста в событие")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        actors = [
+            actor[3] + " " + actor[4] for actor in self.db_manager.select_actors()
+        ]
+        events = [event[2] for event in self.db_manager.select_events()]
+
+        actor_label = tk.Label(self.current_window, text="Артист:")
+        actor_label.pack()
+        actor_combobox = ttk.Combobox(
+            self.current_window, values=actors, state="readonly"
+        )
+        actor_combobox.pack()
+
+        event_label = tk.Label(self.current_window, text="Событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        def submit():
+            actor_id = actor_combobox.current() + 1
+            event_id = event_combobox.current() + 1
+            self.db_manager.add_actor_event_link(actor_id, event_id)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
+    def __rate_event_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Оценка культурного события")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        events = [event[2] for event in self.db_manager.select_events()]
+        ratings = [1, 2, 3, 4, 5]
+
+        event_label = tk.Label(self.current_window, text="Культурное событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        rating_label = tk.Label(self.current_window, text="Оценка:")
+        rating_label.pack()
+        impresario_combobox = ttk.Combobox(
+            self.current_window, values=ratings, state="readonly"
+        )
+        impresario_combobox.pack()
+
+        def submit():
+            event_id = event_combobox.current() + 1
+            rating = impresario_combobox.get()
+
+            self.db_manager.rate_event(event_id, self.username, rating)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
+    def __favorite_actors_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Любимые артисты")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+        favorite_actors = self.db_manager.select_my_favorite_actors(self.username)
+        actors = [
+            (actor[0], actor[3], actor[4])
+            for actor in self.db_manager.select_actors()  # id, name, surname
+        ]
+        unpicked_actors = [actor for actor in actors if actor not in favorite_actors]
+        combobox_actors = {
+            actor[0]: actor[1] + " " + actor[2] for actor in unpicked_actors
+        }
+
+        # Создание таблицы для отображения данных
+        table = ttk.Treeview(
+            self.current_window,
+            columns=(
+                "Name",
+                "Surname",
+            ),
+        )
+        table["show"] = "headings"
+        table.heading("Name", text="Имя артиста")
+        table.heading("Surname", text="Фамилия артиста")
+
+        # Вставка данных в таблицу
+        for row in favorite_actors:
+            table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        # Размещение таблицы на окне
+        table.pack()
+
+        actor_label = tk.Label(self.current_window, text="Добавить любимого артиста:")
+        actor_label.pack()
+        actor_combobox = ttk.Combobox(
+            self.current_window, values=list(combobox_actors.values()), state="readonly"
+        )
+        actor_combobox.pack()
+
+        def submit():
+            # Получаем id импресарио по выбранному ФИО
+            selected_full_name = actor_combobox.get()
+            actor_id = [
+                key
+                for key, value in combobox_actors.items()
+                if value == selected_full_name
+            ][0]
+
+            self.db_manager.add_favorite_actor(self.username, actor_id)
+
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            favorite_actors = self.db_manager.select_my_favorite_actors(self.username)
+
+            # Вставка отфильтрованных данных в таблицу
+            for row in favorite_actors:
+                table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(self.current_window, text="Добавить", command=submit)
+        accept_btn.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __main_menu(self, role):
         self.current_window = tk.Tk()
         self.current_window.title("Главное меню")
@@ -864,7 +1180,7 @@ class GUI:
         if role != "admin_role":
             actors_page_btn = tk.Button(
                 self.current_window,
-                text="Информация об актерах",
+                text="Информация об артистах",
                 command=lambda: self.__set_next_window("actors_page"),
             )
             events_page_btn = tk.Button(
@@ -902,7 +1218,18 @@ class GUI:
                 )
                 create_user_btn.pack()
             case "viewer_role":
-                pass
+                rate_event_btn = tk.Button(
+                    self.current_window,
+                    text="Оценка культурного события",
+                    command=lambda: self.__set_next_window("rate_event"),
+                )
+                rate_event_btn.pack()
+                favorite_actors_btn = tk.Button(
+                    self.current_window,
+                    text="Любимые артисты",
+                    command=lambda: self.__set_next_window("favorite_actors_page"),
+                )
+                favorite_actors_btn.pack()
             case "event_manager_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -910,6 +1237,27 @@ class GUI:
                     command=lambda: self.__set_next_window("create_event"),
                 )
                 create_event_btn.pack()
+
+                create_building_btn = tk.Button(
+                    self.current_window,
+                    text="Создать здание",
+                    command=lambda: self.__set_next_window("create_building"),
+                )
+                create_building_btn.pack()
+
+                create_actor_event_link_btn = tk.Button(
+                    self.current_window,
+                    text="Добавить артиста в событие",
+                    command=lambda: self.__set_next_window("create_actor_event_link"),
+                )
+                create_actor_event_link_btn.pack()
+
+                event_stats_btn = tk.Button(
+                    self.current_window,
+                    text="Статистика по событиям",
+                    command=lambda: self.__set_next_window("event_stats_page"),
+                )
+                event_stats_btn.pack()
             case "impresario_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -952,6 +1300,16 @@ class GUI:
                 next_window = self.__create_user_page()
             case "create_contest":
                 next_window = self.__create_contest_page()
+            case "create_building":
+                next_window = self.__create_building_page()
+            case "create_actor_event_link":
+                next_window = self.__create_actor_event_link_page()
             case "contests_page":
                 next_window = self.__contests_page()
+            case "rate_event":
+                next_window = self.__rate_event_page()
+            case "favorite_actors_page":
+                next_window = self.__favorite_actors_page()
+            case "event_stats_page":
+                next_window = self.__event_stats_page()
         return next_window

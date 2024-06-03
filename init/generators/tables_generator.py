@@ -194,6 +194,30 @@ class TablesGenerator:
                 )
 
     @staticmethod
+    def __add_contest_triggers(cursor):
+        try:
+            cursor.execute(
+                """
+                        CREATE TRIGGER check_places_unique
+                            BEFORE INSERT ON contest
+                            FOR EACH ROW
+                            BEGIN
+                                IF NEW.first_place_id = NEW.second_place_id OR NEW.first_place_id = NEW.third_place_id OR NEW.second_place_id = NEW.third_place_id THEN
+                                    SIGNAL SQLSTATE '45000'
+                                    SET MESSAGE_TEXT = 'Error: The first, second, and third place IDs must be unique';
+                                END IF;
+                            END;
+                        """
+            )
+            if log:
+                print("\t-Trigger 'check_places_unique' created successfully.")
+        except mysql.connector.Error as error:
+            if log:
+                print(
+                    f"\t-Trigger 'check_places_unique' was not created due to: {error}."
+                )
+
+    @staticmethod
     def __trust_function_creators(cursor):
         try:
             cursor.execute("SET GLOBAL log_bin_trust_function_creators = 1;")
@@ -293,9 +317,9 @@ class TablesGenerator:
 
             cursor.execute(
                 """
-                           CREATE PROCEDURE add_building(IN building_name VARCHAR(255))
+                           CREATE PROCEDURE add_building(IN building_name VARCHAR(255), IN type VARCHAR(255))
                                 BEGIN
-                                    INSERT INTO building (name) VALUES (building_name);
+                                    INSERT INTO building (name, type) VALUES (building_name, type);
                                 END
                            """
             )
@@ -315,9 +339,9 @@ class TablesGenerator:
 
             cursor.execute(
                 """
-                           CREATE PROCEDURE add_event(IN name VARCHAR(255), IN genre_name VARCHAR(255), IN impresario_id INT)
+                           CREATE PROCEDURE add_event(IN name VARCHAR(255), IN genre_name VARCHAR(255), IN impresario_id INT, IN building_id INT, IN event_date DATE, IN box_office INT)
                                 BEGIN
-                                    INSERT INTO event (name, genre_name, impresario_id) VALUES (name, genre_name, impresario_id);
+                                    INSERT INTO event (name, genre_name, impresario_id, building_id, event_date, box_office) VALUES (name, genre_name, impresario_id, building_id, event_date, box_office);
                                 END
                            """
             )
@@ -334,6 +358,28 @@ class TablesGenerator:
             )
             if log:
                 print("\t-Procedure 'add_contest' created successfully.")
+
+            cursor.execute(
+                """
+                           CREATE PROCEDURE add_event_rating(IN event_id INT, IN username VARCHAR(255), IN rating INT)
+                                BEGIN
+                                    INSERT INTO event_rating (event_id, username, rating) VALUES (event_id, username, rating);
+                                END
+                           """
+            )
+            if log:
+                print("\t-Procedure 'add_event_rating' created successfully.")
+
+            cursor.execute(
+                """
+                           CREATE PROCEDURE add_actor_event_link(IN actor_id INT, IN event_id INT)
+                                BEGIN
+                                    INSERT INTO actor_event_link (actor_id, event_id) VALUES (actor_id, event_id);
+                                END
+                           """
+            )
+            if log:
+                print("\t-Procedure 'add_event_rating' created successfully.")
 
         except mysql.connector.Error as error:
             if log:
@@ -393,6 +439,8 @@ class TablesGenerator:
                                 genre_name VARCHAR(255),
                                 impresario_id INT,
                                 building_id INT,
+                                event_date DATE,
+                                box_office INT,
                                 creation_date TIMESTAMP,
 
                                 FOREIGN KEY (genre_name) REFERENCES genre(name),
@@ -433,6 +481,22 @@ class TablesGenerator:
 
                                 FOREIGN KEY (actor_id) REFERENCES actor(id) ON DELETE CASCADE,
                                 FOREIGN KEY (genre_name) REFERENCES genre(name) ON DELETE CASCADE
+                            )"""
+        )
+        if log:
+            print("\t-Table 'actor_genre_link' created successfully.")
+
+    @staticmethod
+    def __create_actor_event_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS actor_event_link (
+                                actor_id INT,
+                                event_id INT,
+                                creation_date TIMESTAMP,
+
+                                FOREIGN KEY (actor_id) REFERENCES actor(id) ON DELETE CASCADE,
+                                FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
                             )"""
         )
         if log:
@@ -488,6 +552,48 @@ class TablesGenerator:
             print("\t-Table 'username_role' created successfully.")
 
     @staticmethod
+    def __create_event_rating_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS event_rating (
+                                event_id INT,
+                                username VARCHAR(255),
+                                rating INT,
+                                
+                                FOREIGN KEY (event_id) REFERENCES event(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'event_rating' created successfully.")
+
+    @staticmethod
+    def __create_favorite_actor_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS favorite_actor_link (
+                                actor_id INT,
+                                username VARCHAR(255),
+                                FOREIGN KEY (actor_id) REFERENCES actor(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'favorite_actor_link' created successfully.")
+
+    @staticmethod
+    def __create_actor_event_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS actor_event_link (
+                                actor_id INT,
+                                event_id INT,
+                                FOREIGN KEY (actor_id) REFERENCES actor(id),
+                                FOREIGN KEY (event_id) REFERENCES event(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'actor_event_link' created successfully.")
+
+    @staticmethod
     def create_tables(connector):
         cursor = connector.cursor()
         if log:
@@ -499,9 +605,13 @@ class TablesGenerator:
             TablesGenerator.__create_event_table(cursor)
             TablesGenerator.__create_actor_table(cursor)
             TablesGenerator.__create_actor_genre_link_table(cursor)
+            TablesGenerator.__create_actor_event_link_table(cursor)
             TablesGenerator.__create_impresario_genre_link_table(cursor)
             TablesGenerator.__create_contest_table(cursor)
             TablesGenerator.__create_username_role_table(cursor)
+            TablesGenerator.__create_event_rating_table(cursor)
+            TablesGenerator.__create_favorite_actor_link_table(cursor)
+            TablesGenerator.__create_actor_event_link_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))
@@ -519,6 +629,7 @@ class TablesGenerator:
             TablesGenerator.__add_actor_triggers(cursor)
             TablesGenerator.__add_actor_genre_link_triggers(cursor)
             TablesGenerator.__add_impresario_genre_link_triggers(cursor)
+            TablesGenerator.__add_contest_triggers(cursor)
             TablesGenerator.__add_contest_triggers(cursor)
         except mysql.connector.Error as error:
             if log:
