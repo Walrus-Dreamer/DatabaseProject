@@ -317,9 +317,9 @@ class TablesGenerator:
 
             cursor.execute(
                 """
-                           CREATE PROCEDURE add_building(IN building_name VARCHAR(255))
+                           CREATE PROCEDURE add_building(IN building_name VARCHAR(255), IN type VARCHAR(255))
                                 BEGIN
-                                    INSERT INTO building (name) VALUES (building_name);
+                                    INSERT INTO building (name, type) VALUES (building_name, type);
                                 END
                            """
             )

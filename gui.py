@@ -868,6 +868,48 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __create_building_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Добавление культурного сооружения")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        building_types = ["Театр", "Кинотеатр", "Дворец культуры"]
+
+        building_name_label = tk.Label(self.current_window, text="Название здания:")
+        building_name_label.pack()
+        building_name_entry = tk.Entry(self.current_window)
+        building_name_entry.pack()
+
+        building_type_label = tk.Label(self.current_window, text="Тип здания:")
+        building_type_label.pack()
+        building_type_combobox = ttk.Combobox(
+            self.current_window, values=building_types, state="readonly"
+        )
+        building_type_combobox.pack()
+
+        def submit():
+            building_name = building_name_entry.get()
+            building_type = building_type_combobox.get()
+
+            self.db_manager.create_building(building_name, building_type)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __main_menu(self, role):
         self.current_window = tk.Tk()
         self.current_window.title("Главное меню")
@@ -939,6 +981,13 @@ class GUI:
                     command=lambda: self.__set_next_window("create_event"),
                 )
                 create_event_btn.pack()
+
+                create_building_btn = tk.Button(
+                    self.current_window,
+                    text="Создать здание",
+                    command=lambda: self.__set_next_window("create_building"),
+                )
+                create_building_btn.pack()
             case "impresario_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -981,6 +1030,8 @@ class GUI:
                 next_window = self.__create_user_page()
             case "create_contest":
                 next_window = self.__create_contest_page()
+            case "create_building":
+                next_window = self.__create_building_page()
             case "contests_page":
                 next_window = self.__contests_page()
         return next_window
