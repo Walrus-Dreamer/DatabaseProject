@@ -550,11 +550,23 @@ class TablesGenerator:
                                 rating INT,
                                 
                                 FOREIGN KEY (event_id) REFERENCES event(id)
-
                             )"""
         )
         if log:
             print("\t-Table 'event_rating' created successfully.")
+
+    @staticmethod
+    def __create_favorite_actor_link_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS favorite_actor_link (
+                                actor_id INT,
+                                username VARCHAR(255),
+                                FOREIGN KEY (actor_id) REFERENCES actor(id)
+                            )"""
+        )
+        if log:
+            print("\t-Table 'favorite_actor_link' created successfully.")
 
     @staticmethod
     def create_tables(connector):
@@ -573,6 +585,7 @@ class TablesGenerator:
             TablesGenerator.__create_contest_table(cursor)
             TablesGenerator.__create_username_role_table(cursor)
             TablesGenerator.__create_event_rating_table(cursor)
+            TablesGenerator.__create_favorite_actor_link_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))

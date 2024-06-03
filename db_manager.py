@@ -171,6 +171,24 @@ class DBManager:
         self.role = self.cursor.fetchone()[0]
         return self.role
 
+    def select_my_favorite_actors(self, username):
+        self.cursor.execute(
+            f"""
+                            SELECT actor.id,
+                                    actor.name,
+                                    actor.surname
+                            FROM actor
+                            JOIN favorite_actor_link ON actor.id = favorite_actor_link.actor_id
+                            WHERE favorite_actor_link.username = '{username}';
+                            """
+        )
+        return self.cursor.fetchall()
+
+    def add_favorite_actor(self, username, actor_id):
+        self.cursor.execute(
+            f"INSERT INTO favorite_actor_link VALUES ('{actor_id}', '{username}');"
+        )
+
     def create_user(self, username, password, role):
         self.cursor.execute(
             f"INSERT INTO username_role VALUES ('{username}@localhost', '{role}');"

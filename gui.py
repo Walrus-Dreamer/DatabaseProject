@@ -954,6 +954,83 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __favorite_actors_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Любимые артисты")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+        favorite_actors = self.db_manager.select_my_favorite_actors(self.username)
+        actors = [
+            (actor[0], actor[3], actor[4])
+            for actor in self.db_manager.select_actors()  # id, name, surname
+        ]
+        unpicked_actors = [actor for actor in actors if actor not in favorite_actors]
+        combobox_actors = {
+            actor[0]: actor[1] + " " + actor[2] for actor in unpicked_actors
+        }
+
+        # Создание таблицы для отображения данных
+        table = ttk.Treeview(
+            self.current_window,
+            columns=(
+                "Name",
+                "Surname",
+            ),
+        )
+        table["show"] = "headings"
+        table.heading("Name", text="Имя артиста")
+        table.heading("Surname", text="Фамилия артиста")
+
+        # Вставка данных в таблицу
+        for row in favorite_actors:
+            table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        # Размещение таблицы на окне
+        table.pack()
+
+        actor_label = tk.Label(self.current_window, text="Добавить любимого артиста:")
+        actor_label.pack()
+        actor_combobox = ttk.Combobox(
+            self.current_window, values=list(combobox_actors.values()), state="readonly"
+        )
+        actor_combobox.pack()
+
+        def submit():
+            # Получаем id импресарио по выбранному ФИО
+            selected_full_name = actor_combobox.get()
+            actor_id = [
+                key
+                for key, value in combobox_actors.items()
+                if value == selected_full_name
+            ][0]
+
+            self.db_manager.add_favorite_actor(self.username, actor_id)
+
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            favorite_actors = self.db_manager.select_my_favorite_actors(self.username)
+
+            # Вставка отфильтрованных данных в таблицу
+            for row in favorite_actors:
+                table.insert("", "end", values=row[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(self.current_window, text="Добавить", command=submit)
+        accept_btn.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __main_menu(self, role):
         self.current_window = tk.Tk()
         self.current_window.title("Главное меню")
@@ -1023,6 +1100,12 @@ class GUI:
                     command=lambda: self.__set_next_window("rate_event"),
                 )
                 rate_event_btn.pack()
+                favorite_actors_btn = tk.Button(
+                    self.current_window,
+                    text="Любимые артисты",
+                    command=lambda: self.__set_next_window("favorite_actors_page"),
+                )
+                favorite_actors_btn.pack()
             case "event_manager_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -1085,4 +1168,6 @@ class GUI:
                 next_window = self.__contests_page()
             case "rate_event":
                 next_window = self.__rate_event_page()
+            case "favorite_actors_page":
+                next_window = self.__favorite_actors_page()
         return next_window
