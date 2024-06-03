@@ -13,6 +13,10 @@ class DBManager:
         self.connector.autocommit = True
         self.cursor = self.connector.cursor()
 
+    def __get_my_username(self):
+        self.cursor.execute("SELECT get_my_username();")
+        return self.cursor.fetchone()[0]
+
     def select_all_from(self, table_name):
         # TODO: Закинуть в хранимку.
         self.cursor.execute(f"SELECT * FROM {table_name}")
@@ -52,6 +56,30 @@ class DBManager:
                             FROM event
                             JOIN impresario ON event.impresario_id = impresario.id
                             JOIN building ON impresario.building_id = building.id
+                            """
+        )
+        return self.cursor.fetchall()
+
+    def select_events_with_stats(self):
+        self.cursor.execute(
+            """
+                            SELECT event.id,
+                                    event.name,
+                                    event.genre_name,
+                                    impresario.name AS impresario_name,
+                                    impresario.surname AS impresario_surname,
+                                    building.name AS building_name,
+                                    event.event_date,
+                                    event.box_office,
+                                    event_rating.avg_rating
+                            FROM event
+                            JOIN impresario ON event.impresario_id = impresario.id
+                            JOIN building ON event.building_id = building.id
+                            JOIN (
+                                SELECT event_id, AVG(rating) AS avg_rating
+                                    FROM event_rating
+                                    GROUP BY event_id
+                                ) AS event_rating ON event.id = event_rating.event_id;
                             """
         )
         return self.cursor.fetchall()
@@ -106,6 +134,12 @@ class DBManager:
     def create_building(self, name, type):
         self.cursor.execute(f"CALL add_building('{name}', '{type}')")
 
+    def rate_event(self, event_id, username, rating):
+        print("USERNAME: ", username)
+        self.cursor.execute(
+            f"CALL add_event_rating({event_id}, '{username}', {rating})"
+        )
+
     def print_select_all(self, table_name):
         print(f"{table_name}:")
         result = ""
@@ -129,10 +163,6 @@ class DBManager:
         except mysql.connector.Error as error:
             if log:
                 print(f"\t-Dropping database failed: {error}.")
-
-    def __get_my_username(self):
-        self.cursor.execute("SELECT get_my_username();")
-        return self.cursor.fetchone()[0]
 
     def get_my_role(self):
         self.cursor.execute(

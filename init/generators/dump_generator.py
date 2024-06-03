@@ -220,6 +220,45 @@ class DumpGenerator:
             print("\t-Username_roles dump created successfully.")
 
     @staticmethod
+    def __insert_event_ratings(cursor):
+        cursor.execute(
+            """
+                        INSERT INTO event_rating (event_id, username, rating) VALUES
+                            (1, 'Петя', 5),
+                            (2, 'Петя', 4),
+                            (3, 'Петя', 3),
+                            (4, 'Петя', 2),
+                            (5, 'Петя', 1),
+                            (6, 'Петя', 5),
+                            (7, 'Петя', 4),
+                            (8, 'Петя', 3),
+                            (9, 'Петя', 2),
+                            (10, 'Петя', 1),
+                            (11, 'Петя', 5),
+                            (12, 'Петя', 4),
+                            (13, 'Петя', 3),
+                            (14, 'Петя', 2),
+                            (1, 'Федя', 4),
+                            (2, 'Федя', 3),
+                            (3, 'Федя', 2),
+                            (4, 'Федя', 1),
+                            (5, 'Федя', 5),
+                            (6, 'Федя', 4),
+                            (7, 'Федя', 3),
+                            (8, 'Федя', 2),
+                            (9, 'Федя', 1),
+                            (10, 'Федя', 5),
+                            (11, 'Федя', 4),
+                            (12, 'Федя', 3),
+                            (13, 'Федя', 2),
+                            (14, 'Федя', 1),
+                            (15, 'Федя', 5);
+                        """
+        )
+        if log:
+            print("\t-Event_ratings dump created successfully.")
+
+    @staticmethod
     def create_dump(connector):
         cursor = connector.cursor()
         if log:
@@ -234,6 +273,7 @@ class DumpGenerator:
             DumpGenerator.__insert_impresario_genre_links(cursor)
             DumpGenerator.__insert_contests(cursor)
             DumpGenerator.__insert_username_roles(cursor)
+            DumpGenerator.__insert_event_ratings(cursor)
             if log:
                 print("\t-Dump created successfully.")
         except mysql.connector.Error as error:

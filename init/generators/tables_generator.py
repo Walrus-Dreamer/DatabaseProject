@@ -361,14 +361,14 @@ class TablesGenerator:
 
             cursor.execute(
                 """
-                           CREATE PROCEDURE add_building(IN name VARCHAR(255), IN type VARCHAR(255))
+                           CREATE PROCEDURE add_event_rating(IN event_id INT, IN username VARCHAR(255), IN rating INT)
                                 BEGIN
-                                    INSERT INTO contest (name, type) VALUES (name, type);
+                                    INSERT INTO event_rating (event_id, username, rating) VALUES (event_id, username, rating);
                                 END
                            """
             )
             if log:
-                print("\t-Procedure 'add_building' created successfully.")
+                print("\t-Procedure 'add_event_rating' created successfully.")
 
         except mysql.connector.Error as error:
             if log:
@@ -541,6 +541,22 @@ class TablesGenerator:
             print("\t-Table 'username_role' created successfully.")
 
     @staticmethod
+    def __create_event_rating_table(cursor):
+        cursor.execute(
+            """
+                            CREATE TABLE IF NOT EXISTS event_rating (
+                                event_id INT,
+                                username VARCHAR(255),
+                                rating INT,
+                                
+                                FOREIGN KEY (event_id) REFERENCES event(id)
+
+                            )"""
+        )
+        if log:
+            print("\t-Table 'event_rating' created successfully.")
+
+    @staticmethod
     def create_tables(connector):
         cursor = connector.cursor()
         if log:
@@ -556,6 +572,7 @@ class TablesGenerator:
             TablesGenerator.__create_impresario_genre_link_table(cursor)
             TablesGenerator.__create_contest_table(cursor)
             TablesGenerator.__create_username_role_table(cursor)
+            TablesGenerator.__create_event_rating_table(cursor)
         except mysql.connector.Error as error:
             if log:
                 print("\t-Failed to create table: {}".format(error))

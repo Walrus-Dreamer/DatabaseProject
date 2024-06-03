@@ -343,7 +343,6 @@ class GUI:
         self.current_window.title("Поиск подходящих событий")
         self.current_window.geometry("1280x720")
         self.current_window.resizable(1, 1)
-        events = self.db_manager.select_events()
 
         # Создание таблицы для отображения данных
         table = ttk.Treeview(
@@ -910,6 +909,51 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __rate_event_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Оценка культурного события")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        events = [event[2] for event in self.db_manager.select_events()]
+        ratings = [1, 2, 3, 4, 5]
+
+        event_label = tk.Label(self.current_window, text="Культурное событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        rating_label = tk.Label(self.current_window, text="Оценка:")
+        rating_label.pack()
+        impresario_combobox = ttk.Combobox(
+            self.current_window, values=ratings, state="readonly"
+        )
+        impresario_combobox.pack()
+
+        def submit():
+            event_id = event_combobox.current() + 1
+            rating = impresario_combobox.get()
+
+            self.db_manager.rate_event(event_id, self.username, rating)
+            self.current_window.destroy()
+
+        submit_button = tk.Button(self.current_window, text="Добавить", command=submit)
+        submit_button.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __main_menu(self, role):
         self.current_window = tk.Tk()
         self.current_window.title("Главное меню")
@@ -973,7 +1017,12 @@ class GUI:
                 )
                 create_user_btn.pack()
             case "viewer_role":
-                pass
+                rate_event_btn = tk.Button(
+                    self.current_window,
+                    text="Оценка культурного события",
+                    command=lambda: self.__set_next_window("rate_event"),
+                )
+                rate_event_btn.pack()
             case "event_manager_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -1034,4 +1083,6 @@ class GUI:
                 next_window = self.__create_building_page()
             case "contests_page":
                 next_window = self.__contests_page()
+            case "rate_event":
+                next_window = self.__rate_event_page()
         return next_window
