@@ -436,6 +436,84 @@ class GUI:
         self.current_window.mainloop()
         return "main_menu"
 
+    def __event_stats_page(self):
+        self.current_window = tk.Tk()
+        self.current_window.title("Статистика по событиям")
+        self.current_window.geometry("1280x720")
+        self.current_window.resizable(1, 1)
+
+        # Создание таблицы для отображения данных
+        table = ttk.Treeview(
+            self.current_window,
+            columns=(
+                "Event name",
+                "Genre name",
+                "Impresario full name",
+                "Building name",
+                "Box office",
+                "Average rating",
+                "Actor likes",
+            ),
+        )
+        table["show"] = "headings"
+        table.heading("Event name", text="Название")
+        table.heading("Genre name", text="Жанр")
+        table.heading("Impresario full name", text="ФИО импресарио")
+        table.heading("Building name", text="Место проведения")
+        table.heading("Box office", text="Сборы")
+        table.heading("Average rating", text="Средняя оценка")
+        table.heading("Actor likes", text="Лайки актеров")
+
+        # Размещение таблицы на окне
+        table.pack()
+
+        events = [event[2] for event in self.db_manager.select_events()]
+        event_label = tk.Label(self.current_window, text="Выбрать событие:")
+        event_label.pack()
+        event_combobox = ttk.Combobox(
+            self.current_window, values=events, state="readonly"
+        )
+        event_combobox.pack()
+
+        def show_stats():
+            selected_event_id = event_combobox.current() + 1
+            # Очистка таблицы перед обновлением
+            for row in table.get_children():
+                table.delete(row)
+
+            event_stats = self.db_manager.select_event_stats(selected_event_id)
+            # Вставка отфильтрованных данных в таблицу
+            prepared_data = (
+                        event_stats[0][0],
+                        event_stats[0][1],
+                        event_stats[0][2],
+                        event_stats[0][3] + " " + event_stats[0][4],
+                        event_stats[0][5],
+                        event_stats[0][6],
+                        event_stats[0][7],
+                        event_stats[0][8],
+                    )
+            table.insert("", "end", values=prepared_data[1:])  # Не отображаем id
+
+        accept_btn = tk.Button(
+            self.current_window,
+            text="Показать статистику",
+            command=show_stats,
+        )
+        accept_btn.pack()
+
+        main_menu_button = tk.Button(
+            self.current_window,
+            text="Вернуться в главное меню",
+            command=self.__to_main_menu,
+            fg="red",
+            bg="yellow",
+        )
+        main_menu_button.pack()
+
+        self.current_window.mainloop()
+        return "main_menu"
+
     def __impresarios_page(self):
         self.current_window = tk.Tk()
         self.current_window.title("Информация об импресариоИнформация об импресарио")
@@ -1159,12 +1237,6 @@ class GUI:
                     command=lambda: self.__set_next_window("create_event"),
                 )
                 create_event_btn.pack()
-                create_actor_event_link_btn = tk.Button(
-                    self.current_window,
-                    text="Добавить артиста в событие",
-                    command=lambda: self.__set_next_window("create_actor_event_link"),
-                )
-                create_actor_event_link_btn.pack()
 
                 create_building_btn = tk.Button(
                     self.current_window,
@@ -1172,6 +1244,20 @@ class GUI:
                     command=lambda: self.__set_next_window("create_building"),
                 )
                 create_building_btn.pack()
+
+                create_actor_event_link_btn = tk.Button(
+                    self.current_window,
+                    text="Добавить артиста в событие",
+                    command=lambda: self.__set_next_window("create_actor_event_link"),
+                )
+                create_actor_event_link_btn.pack()
+
+                event_stats_btn = tk.Button(
+                    self.current_window,
+                    text="Статистика по событиям",
+                    command=lambda: self.__set_next_window("event_stats_page"),
+                )
+                event_stats_btn.pack()
             case "impresario_role":
                 create_event_btn = tk.Button(
                     self.current_window,
@@ -1224,4 +1310,6 @@ class GUI:
                 next_window = self.__rate_event_page()
             case "favorite_actors_page":
                 next_window = self.__favorite_actors_page()
+            case "event_stats_page":
+                next_window = self.__event_stats_page()
         return next_window

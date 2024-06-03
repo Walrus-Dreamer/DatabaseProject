@@ -60,18 +60,18 @@ class DBManager:
         )
         return self.cursor.fetchall()
 
-    def select_events_with_stats(self):
+    def select_event_stats(self, event_id):
         self.cursor.execute(
-            """
+            f"""
                             SELECT event.id,
                                     event.name,
                                     event.genre_name,
                                     impresario.name AS impresario_name,
                                     impresario.surname AS impresario_surname,
                                     building.name AS building_name,
-                                    event.event_date,
                                     event.box_office,
-                                    event_rating.avg_rating
+                                    event_rating.avg_rating,
+                                    actor_likes.actor_likes
                             FROM event
                             JOIN impresario ON event.impresario_id = impresario.id
                             JOIN building ON event.building_id = building.id
@@ -79,7 +79,14 @@ class DBManager:
                                 SELECT event_id, AVG(rating) AS avg_rating
                                     FROM event_rating
                                     GROUP BY event_id
-                                ) AS event_rating ON event.id = event_rating.event_id;
+                                ) AS event_rating ON event.id = event_rating.event_id
+                            JOIN (
+                                SELECT event_id,
+                                    COUNT(*) AS actor_likes
+                                    FROM actor_event_link
+                                    GROUP BY event_id
+                                ) AS actor_likes ON event.id = actor_likes.event_id
+                            WHERE event.id = {event_id};
                             """
         )
         return self.cursor.fetchall()
