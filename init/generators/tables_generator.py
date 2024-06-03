@@ -339,9 +339,9 @@ class TablesGenerator:
 
             cursor.execute(
                 """
-                           CREATE PROCEDURE add_event(IN name VARCHAR(255), IN genre_name VARCHAR(255), IN impresario_id INT)
+                           CREATE PROCEDURE add_event(IN name VARCHAR(255), IN genre_name VARCHAR(255), IN impresario_id INT, IN building_id INT, IN event_date DATE, IN box_office INT)
                                 BEGIN
-                                    INSERT INTO event (name, genre_name, impresario_id) VALUES (name, genre_name, impresario_id);
+                                    INSERT INTO event (name, genre_name, impresario_id, building_id, event_date, box_office) VALUES (name, genre_name, impresario_id, building_id, event_date, box_office);
                                 END
                            """
             )
@@ -358,6 +358,17 @@ class TablesGenerator:
             )
             if log:
                 print("\t-Procedure 'add_contest' created successfully.")
+
+            cursor.execute(
+                """
+                           CREATE PROCEDURE add_building(IN name VARCHAR(255), IN type VARCHAR(255))
+                                BEGIN
+                                    INSERT INTO contest (name, type) VALUES (name, type);
+                                END
+                           """
+            )
+            if log:
+                print("\t-Procedure 'add_building' created successfully.")
 
         except mysql.connector.Error as error:
             if log:

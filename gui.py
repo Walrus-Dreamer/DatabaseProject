@@ -622,6 +622,7 @@ class GUI:
             impresario[0]: impresario[2] + " " + impresario[3]
             for impresario in self.db_manager.select_impresarios()
         }
+        buildings = [building[1] for building in self.db_manager.select_buildings()]
 
         event_name_label = tk.Label(self.current_window, text="Название события:")
         event_name_label.pack()
@@ -642,20 +643,48 @@ class GUI:
         )
         impresario_combobox.pack()
 
+        building_label = tk.Label(self.current_window, text="Выберите здание:")
+        building_label.pack()
+        building_combobox = ttk.Combobox(
+            self.current_window, values=buildings, state="readonly"
+        )
+        building_combobox.pack()
+
+        event_date_label = tk.Label(self.current_window, text="Дата события:")
+        event_date_label.pack()
+        event_date_entry = tk.Entry(self.current_window)
+        event_date_entry.pack()
+
+        box_office_label = tk.Label(self.current_window, text="Сборы:")
+        box_office_label.pack()
+        box_office_entry = tk.Entry(self.current_window)
+        box_office_entry.pack()
+
         def submit():
             event_name = event_name_entry.get()
             genre_name = genre_combobox.get()
+            building_id = building_combobox.current() + 1
+            event_date = event_date_entry.get()
+            # TODO: добавить ошибку, если не получается преобразовать в int.
+            box_office = int(box_office_entry.get())
 
             # Получаем id импресарио по выбранному ФИО
             selected_full_name = impresario_combobox.get()
             if not event_name or not genre_name or not selected_full_name:
                 self.error_modal("Заполните все поля!")
                 return
-            selected_id = [
+            impresario_id = [
                 key for key, value in impresarios.items() if value == selected_full_name
             ][0]
 
-            self.db_manager.create_event(event_name, genre_name, selected_id)
+            self.db_manager.create_event(
+                event_name,
+                genre_name,
+                impresario_id,
+                building_id,
+                event_date,
+                box_office,
+            )
             self.current_window.destroy()
 
         submit_button = tk.Button(self.current_window, text="Добавить", command=submit)

@@ -91,15 +91,20 @@ class DBManager:
         )
         return self.cursor.fetchall()
 
-    def create_event(self, name, genre_name, impresario_id):
+    def create_event(
+        self, name, genre_name, impresario_id, building_id, event_date, box_office
+    ):
         self.cursor.execute(
-            f"CALL add_event('{name}', '{genre_name}', {impresario_id})"
+            f"CALL add_event('{name}', '{genre_name}', {impresario_id}, {building_id}, '{event_date}', {box_office})"
         )
 
     def create_contest(self, name, first_place_id, second_place_id, third_place_id):
         self.cursor.execute(
             f"CALL add_contest('{name}', {first_place_id}, {second_place_id}, {third_place_id})"
         )
+
+    def create_building(self, name, type):
+        self.cursor.execute(f"CALL add_building('{name}', '{type}')")
 
     def print_select_all(self, table_name):
         print(f"{table_name}:")
